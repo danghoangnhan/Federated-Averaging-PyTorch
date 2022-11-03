@@ -6,8 +6,8 @@ from multiprocessing import pool, cpu_count
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
-from .client import Client
-from .utils import *
+from src.client import Client
+from src.utils import *
 
 logger = logging.getLogger(__name__)
 

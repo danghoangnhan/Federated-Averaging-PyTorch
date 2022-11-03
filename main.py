@@ -1,12 +1,11 @@
-import os
-import time
 import datetime
-import pickle
-import yaml
-import threading
 import logging
+import os
+import pickle
+import threading
+import time
 
-import torch.nn as nn
+import yaml
 from torch.utils.tensorboard import SummaryWriter
 
 from src.server import Server
@@ -46,11 +45,11 @@ if __name__ == "__main__":
 
     # display and log experiment configuration
     message = "\n[WELCOME] Unfolding configurations...!"
-    print(message);
+    print(message)
     logging.info(message)
 
     for config in configs:
-        print(config);
+        print(config)
         logging.info(config)
     print()
 
