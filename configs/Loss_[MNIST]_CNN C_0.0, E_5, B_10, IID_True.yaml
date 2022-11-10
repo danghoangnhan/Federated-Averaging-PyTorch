@@ -7,13 +7,13 @@ data_config:
   data_path: "./data/"
   dataset_name: "MNIST"
   num_shards: 200
-  iid: False
+  iid: True
 ---
 fed_config:
-  C: 0.1
+  C: 0.0
   K: 100
   R: 500
-  E: 10
+  E: 5
   B: 10
   criterion: torch.nn.CrossEntropyLoss
   optimizer: torch.optim.SGD
@@ -27,12 +27,7 @@ init_config:
   init_gain: 1.0
   gpu_ids: [1,]
 ---
-model_config: 
-  #name: TwoNN
-  #in_features: 784
-  #num_hiddens: 200
-  #num_classes: 10
-  
+model_config:
   name: CNN
   in_channels: 1
   hidden_channels: 32
@@ -40,7 +35,7 @@ model_config:
   num_classes: 10
 ---
 log_config:
-  log_path: "./log/"
+  log_path: "./log/2"
   log_name:  "FL.log"
   tb_port: 5252
   tb_host: "0.0.0.0"

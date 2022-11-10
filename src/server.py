@@ -8,7 +8,7 @@ from tqdm.auto import tqdm
 
 from .client import Client
 from .utils import *
-
+from src.models import *
 logger = logging.getLogger(__name__)
 
 
@@ -42,12 +42,18 @@ class Server(object):
         optim_config: Kwargs provided for optimizer.
     """
 
-    def __init__(self, writer, model_config={}, global_config={}, data_config={}, init_config={}, fed_config={},
-                 optim_config={}):
+    def __init__(self, writer,
+                 model_config={},
+                 global_config={},
+                 data_config={},
+                 init_config={},
+                 fed_config={},
+                 optim_config={},
+                 log_config={}):
         self.clients = None
         self._round = 0
         self.writer = writer
-
+        self.log_config=log_config
         self.model = eval(model_config["name"])(**model_config)
 
         self.seed = global_config["seed"]
@@ -189,9 +195,9 @@ class Server(object):
             selected_total_size += len(self.clients[idx])
 
         message = f"[Round: {str(self._round).zfill(4)}] ...{len(sampled_client_indices)} clients are selected and updated (with total sample size: {str(selected_total_size)})!"
-        print(message);
+        print(message)
         logging.info(message)
-        del message;
+        del message
         gc.collect()
 
         return selected_total_size
@@ -235,9 +241,9 @@ class Server(object):
         self.model.load_state_dict(averaged_weights)
 
         message = f"[Round: {str(self._round).zfill(4)}] ...updated weights of {len(sampled_client_indices)} clients are successfully averaged!"
-        print(message);
+        print(message)
         logging.info(message)
-        del message;
+        del message
         gc.collect()
 
     def evaluate_selected_models(self, sampled_client_indices):
@@ -320,6 +326,7 @@ class Server(object):
         return test_loss, test_accuracy
 
     def fit(self):
+        print("create new server")
         """Execute the whole process of the federated learning."""
         self.results = {"loss": [], "accuracy": []}
         for r in range(self.num_rounds):
@@ -334,13 +341,18 @@ class Server(object):
             self.writer.add_scalars(
                 'Loss',
                 {
-                    f"[{self.dataset_name}]_{self.model.name} C_{self.fraction}, E_{self.local_epochs}, B_{self.batch_size}, IID_{self.iid}": test_loss},
+                    f"[{self.dataset_name}]_{self.model.name} C_{self.fraction}, E_{self.local_epochs},"
+                    f" B_{self.batch_size},"
+                    f" IID_{self.iid}": test_loss},
                 self._round
             )
             self.writer.add_scalars(
                 'Accuracy',
                 {
-                    f"[{self.dataset_name}]_{self.model.name} C_{self.fraction}, E_{self.local_epochs}, B_{self.batch_size}, IID_{self.iid}": test_accuracy},
+                    f"[{self.dataset_name}]_{self.model.name} C_{self.fraction},"
+                    f" E_{self.local_epochs},"
+                    f" B_{self.batch_size},"
+                    f" IID_{self.iid}": test_accuracy},
                 self._round
             )
 
