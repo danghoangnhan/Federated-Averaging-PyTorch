@@ -6,11 +6,10 @@ from multiprocessing import pool, cpu_count
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
+
 from .client import Client
 from .utils import *
-from src.models import *
-logger = logging.getLogger(__name__)
-
+from src.models import  *
 
 class Server(object):
     """Class for implementing center server orchestrating the whole process of federated learning
