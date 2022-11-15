@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> c4f248831aa34b2cee60bf0087780087fb82ed42
 import concurrent
 import datetime
 import logging
@@ -7,6 +11,7 @@ import time
 from os import listdir
 from os.path import isfile, join
 from concurrent.futures import ThreadPoolExecutor
+<<<<<<< HEAD
 from multiprocessing import pool
 from src.server import Server
 
@@ -17,10 +22,9 @@ from os.path import isfile, join
 from src.server import Server
 from src.utils import launch_tensor_board
 
-def run(serverModel:Server):
-    serverModel.fit()
 
 def loadConfig(filePath):
+    # read configuration fil
     with open(filePath) as c:
         configs = list(yaml.load_all(c, Loader=yaml.FullLoader))
     global_config = configs[0]["global_config"]
@@ -36,7 +40,8 @@ def loadConfig(filePath):
         print(config)
         logging.info(config)
     print()
-    return configs,global_config, data_config, fed_config, optim_config, init_config, model_config, log_config
+    return configs, global_config, data_config, fed_config, optim_config, init_config, model_config, log_config
+
 
 if __name__ == "__main__":
     serverList = []
@@ -86,3 +91,7 @@ if __name__ == "__main__":
     time.sleep(3.0)
     for server in serverList:
         server.fit()
+    with ThreadPoolExecutor() as executor:
+        result = [executor.submit(target=server.fit()) for server in serverList]
+        for f in concurrent.futures.as_completed(result):
+            print(f.result())
