@@ -1,24 +1,16 @@
-<<<<<<< HEAD
-=======
 
->>>>>>> c4f248831aa34b2cee60bf0087780087fb82ed42
 import concurrent
-import datetime
 import logging
 import os
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 from os import listdir
 from os.path import isfile, join
-from concurrent.futures import ThreadPoolExecutor
-<<<<<<< HEAD
-from multiprocessing import pool
-from src.server import Server
 
 import yaml
 from torch.utils.tensorboard import SummaryWriter
-from os import listdir
-from os.path import isfile, join
+
 from src.server import Server
 from src.utils import launch_tensor_board
 
