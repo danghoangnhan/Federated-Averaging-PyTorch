@@ -10,10 +10,10 @@ data_config:
   iid: False
 ---
 fed_config:
-  C: 0.1
+  C: 0.5
   K: 100
   R: 500
-  E: 10
+  E: 5
   B: 10
   criterion: torch.nn.CrossEntropyLoss
   optimizer: torch.optim.SGD
@@ -25,7 +25,7 @@ optim_config:
 init_config:
   init_type: "xavier"
   init_gain: 1.0
-  gpu_ids: [0,]
+  gpu_ids: [0,1]
 ---
 model_config:
   #name: TwoNN
@@ -40,7 +40,7 @@ model_config:
   num_classes: 10
 ---
 log_config:
-  log_path: "./log/"
+  log_path: "./log/5/"
   log_name:  "FL.log"
   tb_port: 5252
   tb_host: "0.0.0.0"
