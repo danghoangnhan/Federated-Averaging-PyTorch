@@ -75,7 +75,7 @@ class Server(object):
         self.criterion = fed_config["criterion"]
         self.optimizer = fed_config["optimizer"]
         self.optim_config = optim_config
-
+        self.total_client_indices = [int(x) for x in range(self.num_clients)]
     def setup(self, **init_kwargs):
         """Set up all configuration for federated learning."""
         # valid only before the very first round
@@ -248,9 +248,9 @@ class Server(object):
     def evaluate_selected_models(self, sampled_client_indices):
         """Call "client_evaluate" function of each selected client."""
         message = f"[Round: {str(self._round).zfill(4)}] Evaluate selected {str(len(sampled_client_indices))} clients' models...!"
-        print(message);
+        print(message)
         logging.info(message)
-        del message;
+        del message
         gc.collect()
 
         for idx in sampled_client_indices:
@@ -278,10 +278,10 @@ class Server(object):
         # updated selected clients with local dataset
         if self.mp_flag:
             with pool.ThreadPool(processes=cpu_count() - 1) as workhorse:
-                selected_total_size = workhorse.map(self.mp_update_selected_clients, sampled_client_indices)
+                selected_total_size = workhorse.map(self.mp_update_selected_clients, self.total_client_indices)
             selected_total_size = sum(selected_total_size)
         else:
-            selected_total_size = self.update_selected_clients(sampled_client_indices)
+            selected_total_size = self.update_selected_clients(self.total_client_indices)
 
         # evaluate selected clients with local dataset (same as the one used for local update)
         if self.mp_flag:
