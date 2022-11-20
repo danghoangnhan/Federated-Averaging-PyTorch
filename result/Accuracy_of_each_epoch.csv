@@ -1,0 +1,4 @@
+,round 1,round 2,round 3,round 4,round 5,,Best Accuracy
+SingleMachine_MNIST(MLP),91.85,94.66,95.47,95.92,96.2,,96.2
+SingleMachine_MNIST(CNN),95.49,97.72,98.26,98.56,98.64,,98.64
+SingleMachine_CIFAR10(CNN),26.2,33.7,38.82,42.59,45.27,,45.27
