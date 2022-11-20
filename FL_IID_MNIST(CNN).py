@@ -16,29 +16,27 @@ With this tutorial, you will learn the following key components of FLSim:
     python3 cifar10_example.py --config-file configs/cifar10_config.json
 """
 import json
+
 import flsim.configs  # noqa
 import hydra
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
 from flsim.data.data_sharder import SequentialSharder
 from flsim.interfaces.metrics_reporter import Channel
-from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.config_utils import fl_config_from_json
+from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.example_utils import (
     DataLoader,
     DataProvider,
     FLModel,
     MetricsReporter,
-    SimpleConvNet,
 )
 from hydra.utils import instantiate
-from omegaconf import MISSING, DictConfig, OmegaConf
-from torchvision import datasets,transforms
-from torch import Tensor
-from script.ResultToCSV import CreateHeader, CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
-from script.getKL import get_KL_value
+from omegaconf import DictConfig, OmegaConf
+from torchvision import datasets, transforms
+
 from model.MNIST_CNN import MNIST_CNN
+from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
+from script.getKL import get_KL_value
 
 IMAGE_SIZE = 28
 

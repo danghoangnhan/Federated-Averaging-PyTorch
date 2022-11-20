@@ -36,7 +36,7 @@ from flsim.utils.example_utils import (
 )
 from hydra.utils import instantiate
 from omegaconf import MISSING, DictConfig, OmegaConf
-from torchvision import datasets,transforms
+from torchvision import datasets, transforms
 from torch import Tensor
 from script.ResultToCSV import CreateHeader, CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
 from script.getKL import get_KL_value
@@ -45,8 +45,8 @@ from model.MNIST_MLP import MNIST_MLP
 
 IMAGE_SIZE = 28
 
-def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = False):
 
+def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = False):
     transform = transforms.Compose(
         [
             transforms.Resize(IMAGE_SIZE),
@@ -61,29 +61,29 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
     test_dataset = datasets.MNIST(
         root="../Experiment/data/MNIST", train=False, download=True, transform=transform
     )
-    client_num=int(len(train_dataset)/examples_per_user)
-    #print(client_num)
-    #divide train dataset(non-iid)
+    client_num = int(len(train_dataset) / examples_per_user)
+    # print(client_num)
+    # divide train dataset(non-iid)
     dict_users = mnist_noniid(train_dataset, client_num)
     sorted_train_dataset = []
-    #print(len(dict_users[0]))
+    # print(len(dict_users[0]))
 
-    #merge train dataset
+    # merge train dataset
     for k in range(client_num):
         for i in range(examples_per_user):
-            index=int(dict_users[k][i])
+            index = int(dict_users[k][i])
             sorted_train_dataset.append(train_dataset[index])
-    
+
     KL_of_each_client, avg_KL = get_KL_value(sorted_train_dataset, 10, client_num)
 
     Save_KL_Result("FL_non_IID_MNIST(MLP)", KL_of_each_client, avg_KL)
-    #get the amount of each class
+    # get the amount of each class
     num_of_class_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     for i in range(len(sorted_train_dataset)):
-        index=sorted_train_dataset[i][1]
-        num_of_class_list[index]=num_of_class_list[index]+1
-    #print(num_of_class_list)    
+        index = sorted_train_dataset[i][1]
+        num_of_class_list[index] = num_of_class_list[index] + 1
+    # print(num_of_class_list)
 
     sharder = SequentialSharder(examples_per_shard=examples_per_user)
     fl_data_loader = DataLoader(
@@ -95,39 +95,39 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
 
 
 def main(
-    trainer_config,
-    data_config,
-    use_cuda_if_available: bool = True,
+        trainer_config,
+        data_config,
+        use_cuda_if_available: bool = True,
 ) -> None:
     cuda_enabled = torch.cuda.is_available() and use_cuda_if_available
     device = torch.device(f"cuda:{0}" if cuda_enabled else "cpu")
     model = MNIST_MLP()
     # pyre-fixme[6]: Expected `Optional[str]` for 2nd param but got `device`.
     global_model = FLModel(model, device)
-    assert(global_model.fl_get_module() == model)
+    assert (global_model.fl_get_module() == model)
 
     if cuda_enabled:
         global_model.fl_cuda()
-    #print(f"Created {trainer_config._target_}")
+    # print(f"Created {trainer_config._target_}")
     data_provider = build_data_provider(
         local_batch_size=data_config.local_batch_size,
         examples_per_user=data_config.examples_per_user,
         drop_last=False,
     )
-    
-    #print(trainer_config)
-    #print(data_config)
-    
+
+    # print(trainer_config)
+    # print(data_config)
+
     metrics_reporter = MetricsReporter([Channel.TENSORBOARD, Channel.STDOUT])
-    
+
     trainer = instantiate(trainer_config, model=global_model, cuda_enabled=cuda_enabled)
-    
-    #print(global_model)
-    #print(model)
-    #print(device)
-    #print(data_provider)
-    #print(metrics_reporter)
-    #print(data_provider.num_train_users())
+
+    # print(global_model)
+    # print(model)
+    # print(device)
+    # print(data_provider)
+    # print(metrics_reporter)
+    # print(data_provider.num_train_users())
     final_model, eval_score = trainer.train(
         data_provider=data_provider,
         metrics_reporter=metrics_reporter,
@@ -141,18 +141,19 @@ def main(
     )
     accuracy_of_each_epoch = metrics_reporter.AccuracyList
     best_accuracy_of_each_epoch = max(accuracy_of_each_epoch)
-    #print("Accuracy list:",accuracy_of_each_epoch)
-    #print("Best Accuracy:",best_accuracy_of_each_epoch)
+    # print("Accuracy list:",accuracy_of_each_epoch)
+    # print("Best Accuracy:",best_accuracy_of_each_epoch)
 
-    Save_Accuracy_of_each_epoch(1, "FL_non_IID_MNIST(MLP)", accuracy_of_each_epoch,best_accuracy_of_each_epoch)
-    client_num=data_provider.num_train_users()
-    CreateResultData("FL_non_IID_MNIST(MLP)", "MNIST", "MLP", "non-IID", client_num, int(trainer_config.epochs), eval_score['Accuracy'], "")
-   
+    Save_Accuracy_of_each_epoch(1, "FL_non_IID_MNIST(MLP)", accuracy_of_each_epoch, best_accuracy_of_each_epoch)
+    client_num = data_provider.num_train_users()
+    CreateResultData("FL_non_IID_MNIST(MLP)", "MNIST", "MLP", "non-IID", client_num, int(trainer_config.epochs),
+                     eval_score['Accuracy'], "")
 
-@hydra.main(config_path="configs", config_name="MNIST_config" , version_base="1.2")
+
+@hydra.main(config_path="configs", config_name="MNIST_config", version_base="1.2")
 def run(cfg: DictConfig) -> None:
     print('-------------------FL_non_IID_MNIST(MLP)-------------------')
-    #print(cfg)
+    # print(cfg)
     trainer_config = cfg.trainer
     data_config = cfg.data
     main(
@@ -162,12 +163,11 @@ def run(cfg: DictConfig) -> None:
 
 
 if __name__ == "__main__":
-    
     f = open('configs/MNIST_config.json')
     data = json.load(f)
     json_cfg = fl_config_from_json(data)
-    #print(cfg1)
+    # print(cfg1)
     cfg = maybe_parse_json_config()
-    cfg=OmegaConf.create(json_cfg)
+    cfg = OmegaConf.create(json_cfg)
 
     run(cfg)

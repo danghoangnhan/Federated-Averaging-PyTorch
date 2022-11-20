@@ -6,10 +6,10 @@ from multiprocessing import pool, cpu_count
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
-
 from .client import Client
 from .utils import *
-from src.models import  *
+from src.models import *
+
 
 class Server(object):
     """Class for implementing center server orchestrating the whole process of federated learning
@@ -52,7 +52,7 @@ class Server(object):
         self.clients = None
         self._round = 0
         self.writer = writer
-        self.log_config=log_config
+        self.log_config = log_config
         self.model = eval(model_config["name"])(**model_config)
 
         self.seed = global_config["seed"]
@@ -75,12 +75,8 @@ class Server(object):
         self.criterion = fed_config["criterion"]
         self.optimizer = fed_config["optimizer"]
         self.optim_config = optim_config
-<<<<<<< HEAD
-        self.total_client_indices  = [ int(x) for x in range(self.num_clients) ]
-
-=======
         self.total_client_indices = [int(x) for x in range(self.num_clients)]
->>>>>>> main
+
     def setup(self, **init_kwargs):
         """Set up all configuration for federated learning."""
         # valid only before the very first round
