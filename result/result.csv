@@ -1,1 +1,3 @@
 ,Dataset,Model,DataType,Number of Client,Number of Epoch,Algorithm Execution Time,Accuracy
+SingleMachine_MNIST(MLP),MNIST,MLP,,,5,,96.2
+SingleMachine_MNIST(MLP),MNIST,MLP,,,5,,96.2

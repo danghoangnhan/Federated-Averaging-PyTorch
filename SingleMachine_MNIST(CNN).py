@@ -1,14 +1,16 @@
 from __future__ import print_function
+
 import argparse
+
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
-from script.ResultToCSV import CreateHeader, CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
-from script.getKL import get_KL_value
+from torchvision import datasets, transforms
+
 from model.MNIST_CNN import MNIST_CNN
+from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
+from script.getKL import get_KL_value
 
 
 def train(args, model, device, train_loader, optimizer, epoch):
@@ -23,7 +25,7 @@ def train(args, model, device, train_loader, optimizer, epoch):
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader), loss.item()))
+                       100. * batch_idx / len(train_loader), loss.item()))
             if args.dry_run:
                 break
 
@@ -45,9 +47,10 @@ def test(model, device, test_loader):
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
-    
-    accuracy= 100. * correct / len(test_loader.dataset)
+
+    accuracy = 100. * correct / len(test_loader.dataset)
     return accuracy
+
 
 def main():
     # Training settings
@@ -88,18 +91,18 @@ def main():
         train_kwargs.update(cuda_kwargs)
         test_kwargs.update(cuda_kwargs)
 
-    transform=transforms.Compose([
+    transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,))
-        ])
-    dataset1 = datasets.MNIST(root='../Experiment/data/MNIST', train=True, download=True,
-                       transform=transform)
-    dataset2 = datasets.MNIST(root='../Experiment/data/MNIST', train=False,
-                       transform=transform)
+    ])
+    dataset1 = datasets.MNIST(root='./data/', train=True, download=True,
+                              transform=transform)
+    dataset2 = datasets.MNIST(root='./data/', train=False,
+                              transform=transform)
     KL_of_each_client, avg_KL = get_KL_value(dataset1, 10, 1)
     Save_KL_Result("SingleMachine_MNIST(CNN)", KL_of_each_client, avg_KL)
-    
-    train_loader = torch.utils.data.DataLoader(dataset1,**train_kwargs)
+
+    train_loader = torch.utils.data.DataLoader(dataset1, **train_kwargs)
     test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs)
 
     model = MNIST_CNN().to(device)
@@ -113,14 +116,14 @@ def main():
         accuracy = test(model, device, test_loader)
         scheduler.step()
         accuracy_of_each_epoch.append(accuracy)
-        
-    best_accuracy_of_each_epoch = max(accuracy_of_each_epoch)
-    #print("Accuracy list:",accuracy_of_each_epoch)
-    #print("Best Accuracy:",best_accuracy_of_each_epoch)
 
-    Save_Accuracy_of_each_epoch(1, "SingleMachine_MNIST(CNN)", accuracy_of_each_epoch,best_accuracy_of_each_epoch)    
+    best_accuracy_of_each_epoch = max(accuracy_of_each_epoch)
+    # print("Accuracy list:",accuracy_of_each_epoch)
+    # print("Best Accuracy:",best_accuracy_of_each_epoch)
+
+    Save_Accuracy_of_each_epoch(1, "SingleMachine_MNIST(CNN)", accuracy_of_each_epoch, best_accuracy_of_each_epoch)
     CreateResultData("SingleMachine_MNIST(CNN)", "MNIST", "CNN", "", "", args.epochs, accuracy, "")
-    
+
     if args.save_model:
         torch.save(model.state_dict(), "mnist_cnn.pt")
 

@@ -1,14 +1,17 @@
 from __future__ import print_function
+
 import argparse
+
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
-from script.ResultToCSV import CreateHeader, CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
-from script.getKL import get_KL_value
+from torchvision import datasets, transforms
+
 from model.MNIST_MLP import MNIST_MLP
+from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
+from script.getKL import get_KL_value
+
 
 def train(args, model, device, train_loader, optimizer, epoch):
     model.train()
@@ -92,9 +95,9 @@ def main():
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,))
         ])
-    dataset1 = datasets.MNIST(root='../Experiment/data/MNIST', train=True, download=True,
+    dataset1 = datasets.MNIST(root='./data/', train=True, download=True,
                        transform=transform)
-    dataset2 = datasets.MNIST(root='../Experiment/data/MNIST', train=False,
+    dataset2 = datasets.MNIST(root='./data/', train=False,
                        transform=transform)
     KL_of_each_client, avg_KL = get_KL_value(dataset1, 10, 1)
     #print(KL_of_each_client)
