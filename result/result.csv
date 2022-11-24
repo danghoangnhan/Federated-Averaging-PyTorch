@@ -1,1 +1,3 @@
 ,Dataset,Model,DataType,Number of Client,Number of Epoch,Algorithm Execution Time,Accuracy
+SingleMachine_MNIST(CNN),MNIST,CNN,,,5,,98.79
+SingleMachine_MNIST(CNN),MNIST,CNN,,,10,,98.2

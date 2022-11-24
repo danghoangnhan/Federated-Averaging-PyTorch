@@ -16,38 +16,36 @@ With this tutorial, you will learn the following key components of FLSim:
     python3 cifar10_example.py --config-file configs/cifar10_config.json
 """
 import json
+
 import flsim.configs  # noqa
 import hydra
 import torch
-import numpy as np
 from flsim.data.data_sharder import SequentialSharder
 from flsim.interfaces.metrics_reporter import Channel
-from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.config_utils import fl_config_from_json
+from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.example_utils import (
     DataLoader,
     DataProvider,
     FLModel,
     MetricsReporter,
-    SimpleConvNet,
 )
 from hydra.utils import instantiate
-from omegaconf import MISSING, DictConfig, OmegaConf
+from omegaconf import DictConfig, OmegaConf
 from torchvision import transforms
 from torchvision.datasets.cifar import CIFAR10
-from script.ResultToCSV import CreateHeader, CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
-from script.getKL import get_KL_value
-from script.non_iid import cifar10_noniid
-from model.CIFAR10_CNN import CIFAR10_CNN
+
+from algorithm.ILP_Algorithm import ILP_method
 from configs.ILP_Heuristic_method_parameter import (
     num_of_original_client,
     num_of_head_client,
-    data_size_of_original_CIFAR10_client,
     num_of_CIFAR10_label,
-    Max_value_of_ILP,           
+    Max_value_of_ILP,
 )
-from algorithm.ILP_Algorithm import ILP_method
-
+from model.CIFAR10_CNN import CIFAR10_CNN
+from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
+from script.getKL import get_KL_value
+from script.non_iid import cifar10_noniid
 
 IMAGE_SIZE = 32
 

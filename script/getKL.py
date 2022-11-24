@@ -11,6 +11,11 @@ from torch import Tensor
 from torch import arange
 import matplotlib.pyplot as plt
 import math
+
+
+def KL_function(num_of_label,dataset_size,P_i,Q):
+    #P_i => list.
+    
 import time
 
 

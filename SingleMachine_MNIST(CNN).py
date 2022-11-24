@@ -1,3 +1,13 @@
+
+
+
+
+
+
+
+
+
+
 from __future__ import print_function
 import argparse
 import torch
@@ -21,9 +31,9 @@ def train(args, model, device, train_loader, optimizer, epoch):
         loss.backward()
         optimizer.step()
         if batch_idx % args.log_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(data), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader), loss.item()))
+            #print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                #epoch, batch_idx * len(data), len(train_loader.dataset),
+                #100. * batch_idx / len(train_loader), loss.item()))
             if args.dry_run:
                 break
 
@@ -52,13 +62,13 @@ def test(model, device, test_loader):
 def main():
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
-    parser.add_argument('--batch-size', type=int, default=1000, metavar='N',
+    parser.add_argument('--batch-size', type=int, default=10, metavar='N',
                         help='input batch size for training (default: 64)')
     parser.add_argument('--test-batch-size', type=int, default=10000, metavar='N',
                         help='input batch size for testing (default: 1000)')
-    parser.add_argument('--epochs', type=int, default=5, metavar='N',
+    parser.add_argument('--epochs', type=int, default=10, metavar='N',
                         help='number of epochs to train (default: 14)')
-    parser.add_argument('--lr', type=float, default=1.0, metavar='LR',
+    parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
                         help='learning rate (default: 1.0)')
     parser.add_argument('--gamma', type=float, default=0.7, metavar='M',
                         help='Learning rate step gamma (default: 0.7)')
@@ -92,9 +102,9 @@ def main():
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,))
         ])
-    dataset1 = datasets.MNIST(root='../Experiment/data/MNIST', train=True, download=True,
+    dataset1 = datasets.MNIST(root='./data/', train=True, download=True,
                        transform=transform)
-    dataset2 = datasets.MNIST(root='../Experiment/data/MNIST', train=False,
+    dataset2 = datasets.MNIST(root='./data/', train=False,
                        transform=transform)
     KL_of_each_client, avg_KL = get_KL_value(dataset1, 10, 1)
     Save_KL_Result("SingleMachine_MNIST(CNN)", KL_of_each_client, avg_KL)
@@ -108,15 +118,15 @@ def main():
     scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
     print('-------------------SingleMachine_MNIST(CNN)-------------------')
     accuracy_of_each_epoch = []
-    for epoch in range(1, args.epochs + 1):
+    for epoch in range(400):
         train(args, model, device, train_loader, optimizer, epoch)
         accuracy = test(model, device, test_loader)
         scheduler.step()
         accuracy_of_each_epoch.append(accuracy)
         
     best_accuracy_of_each_epoch = max(accuracy_of_each_epoch)
-    #print("Accuracy list:",accuracy_of_each_epoch)
-    #print("Best Accuracy:",best_accuracy_of_each_epoch)
+    print("Accuracy list:",accuracy_of_each_epoch)
+    print("Best Accuracy:",best_accuracy_of_each_epoch)
 
     Save_Accuracy_of_each_epoch(1, "SingleMachine_MNIST(CNN)", accuracy_of_each_epoch,best_accuracy_of_each_epoch)    
     CreateResultData("SingleMachine_MNIST(CNN)", "MNIST", "CNN", "", "", args.epochs, accuracy, "")
