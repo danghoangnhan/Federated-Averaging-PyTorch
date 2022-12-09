@@ -1,0 +1,2 @@
+,round 1,round 2,round 3,round 4,round 5,,Best Accuracy
+SingleMachine_MNIST(MLP),91.85,94.66,95.47,95.92,96.2,,96.2

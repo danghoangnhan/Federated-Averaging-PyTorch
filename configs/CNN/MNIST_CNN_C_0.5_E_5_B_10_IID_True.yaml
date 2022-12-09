@@ -7,10 +7,10 @@ data_config:
   data_path: "./data/"
   dataset_name: "MNIST"
   num_shards: 200
-  iid: False
+  iid: True
 ---
 fed_config:
-  C: 1.0
+  C: 0.5
   K: 100
   R: 500
   E: 5
@@ -25,7 +25,7 @@ optim_config:
 init_config:
   init_type: "xavier"
   init_gain: 1.0
-  gpu_ids: [0,1]
+  gpu_ids: [1,]
 ---
 model_config:
   #name: TwoNN
@@ -40,7 +40,7 @@ model_config:
   num_classes: 10
 ---
 log_config:
-  log_path: "./log/7/"
+  log_path: "./log/6"
   log_name:  "FL.log"
   tb_port: 5252
   tb_host: "0.0.0.0"
