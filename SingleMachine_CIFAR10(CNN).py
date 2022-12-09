@@ -11,33 +11,29 @@ from script.ResultToCSV import CreateHeader, CreateResultData, Save_KL_Result, S
 from script.getKL import get_KL_value
 from model.CIFAR10_CNN import CIFAR10_CNN
 
-batch_size = 1000
-num_of_epoch = 5
+batch_size = 10
+num_of_epoch = 300
 
 
-    
 def imshow(img):
-    img = img / 2 + 0.5     # unnormalize
+    img = img / 2 + 0.5  # unnormalize
     npimg = img.numpy()
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
     plt.show()
 
 
 def main():
-    
     print('-------------------SingleMachine_CIFAR10(CNN)-------------------')
     #####Load and normalize CIFAR10#####
     classes = ('plane', 'car', 'bird', 'cat',
-            'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-
+               'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
     transform = transforms.Compose(
-    [transforms.ToTensor(),
-     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-
+        [transforms.ToTensor(),
+         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     trainset = torchvision.datasets.CIFAR10(root='../Experiment/data/cifar10', train=True,
-                                            download=True, transform=transform)   
+                                            download=True, transform=transform)
 
     testset = torchvision.datasets.CIFAR10(root='../Experiment/data/cifar10', train=False,
                                            download=True, transform=transform)
@@ -47,21 +43,18 @@ def main():
 
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
                                               shuffle=True, num_workers=1)
-    
+
     testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
                                              shuffle=False, num_workers=1)
-    
-      
 
     # get some random training images
     dataiter = iter(trainloader)
-    images, labels = dataiter.next()
+    images, labels = next(dataiter)
 
     # show images
-    #imshow(torchvision.utils.make_grid(images))
+    # imshow(torchvision.utils.make_grid(images))
     # print labels
-    #print(' '.join(f'{classes[labels[j]]:5s}' for j in range(batch_size)))
-
+    # print(' '.join(f'{classes[labels[j]]:5s}' for j in range(batch_size)))
 
     #####Define a Convolutional Neural Network#####
     net = CIFAR10_CNN()
@@ -84,7 +77,7 @@ def main():
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
-            
+
         correct = 0
         total = 0
         # since we're not training, we don't need to calculate the gradients for our outputs
@@ -101,10 +94,9 @@ def main():
         print(f'Accuracy of the network on the 10000 test images: {eval_accuracy:.2f} %')
         accuracy_of_each_epoch.append(eval_accuracy)
 
-        
     best_accuracy_of_each_epoch = max(accuracy_of_each_epoch)
-    #print("Accuracy list:",accuracy_of_each_epoch)
-    #print("Best Accuracy:",best_accuracy_of_each_epoch)
+    # print("Accuracy list:",accuracy_of_each_epoch)
+    # print("Best Accuracy:",best_accuracy_of_each_epoch)
     print('Finished Training')
     PATH = 'cifar_net.pth'
     torch.save(net.state_dict(), PATH)
@@ -113,15 +105,15 @@ def main():
     images, labels = dataiter.next()
 
     # print images
-    #imshow(torchvision.utils.make_grid(images))
-    #print('GroundTruth: ', ' '.join(f'{classes[labels[j]]:5s}' for j in range(batch_size)))
+    # imshow(torchvision.utils.make_grid(images))
+    # print('GroundTruth: ', ' '.join(f'{classes[labels[j]]:5s}' for j in range(batch_size)))
     net = CIFAR10_CNN()
     net.load_state_dict(torch.load(PATH))
     outputs = net(images)
     _, predicted = torch.max(outputs, 1)
 
-    #print('Predicted: ', ' '.join(f'{classes[predicted[j]]:5s}'
-                                 # for j in range(batch_size)))
+    # print('Predicted: ', ' '.join(f'{classes[predicted[j]]:5s}'
+    # for j in range(batch_size)))
     correct = 0
     total = 0
     # since we're not training, we don't need to calculate the gradients for our outputs
@@ -136,9 +128,9 @@ def main():
             correct += (predicted == labels).sum().item()
 
     print(f'Accuracy of the network on the 10000 test images: {100 * correct // total:} %')
-    
+
     total_accuracy = 100 * correct / total
-    #print(total_accuracy)
+    # print(total_accuracy)
     # prepare to count predictions for each class
     correct_pred = {classname: 0 for classname in classes}
     total_pred = {classname: 0 for classname in classes}
@@ -155,16 +147,15 @@ def main():
                     correct_pred[classes[label]] += 1
                 total_pred[classes[label]] += 1
 
-
     # print accuracy for each class
     for classname, correct_count in correct_pred.items():
         accuracy = 100 * float(correct_count) / total_pred[classname]
         print(f'Accuracy for class: {classname:5s} is {accuracy:.2f} %')
 
-    Save_Accuracy_of_each_epoch(1, "SingleMachine_CIFAR10(CNN)", accuracy_of_each_epoch,best_accuracy_of_each_epoch)    
+    Save_Accuracy_of_each_epoch(1, "SingleMachine_CIFAR10(CNN)", accuracy_of_each_epoch, best_accuracy_of_each_epoch)
 
     CreateResultData("SingleMachine_CIFAR10(CNN)", "CIFAR10", "CNN", "", "", num_of_epoch, total_accuracy, "")
 
-        
+
 if __name__ == '__main__':
     main()

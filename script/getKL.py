@@ -13,11 +13,6 @@ import matplotlib.pyplot as plt
 import math
 
 
-def KL_function(num_of_label,dataset_size,P_i,Q):
-    #P_i => list.
-    
-import time
-
 
 def KL_function(num_of_label, dataset_size, P_i, Q):
     # P_i => list.

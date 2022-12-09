@@ -28,16 +28,16 @@ init_config:
   gpu_ids: [1,]
 ---
 model_config:
-  #name: TwoNN
-  #in_features: 784
-  #num_hiddens: 200
-  #num_classes: 10
-
-  name: CNN
-  in_channels: 1
-  hidden_channels: 32
-  num_hiddens: 512
+  name: TwoNN
+  in_features: 784
+  num_hiddens: 200
   num_classes: 10
+
+  #name: CNN
+  #in_channels: 1
+  #hidden_channels: 32
+  #num_hiddens: 512
+  #num_classes: 10
 ---
 log_config:
   log_path: "./log/2"
