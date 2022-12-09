@@ -37,7 +37,7 @@ def loadConfig(filePath):
 
 if __name__ == "__main__":
     serverList = []
-    mypath = "./configs/"
+    mypath = "./configs/TwoNN"
     logDir = ""
     processList = []
     for fileName in [fileName for fileName in listdir(mypath) if isfile(join(mypath, fileName))]:
