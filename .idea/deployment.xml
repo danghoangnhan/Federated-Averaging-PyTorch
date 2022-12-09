@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="altos@140.136.149.209:22" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="danieldu@140.136.149.212:22 password" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
       <paths name="altos@140.136.149.209:22">
         <serverdata>
           <mappings>
             <mapping deploy="/tmp/pycharm_project_780" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="danieldu@140.136.149.212:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_496" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="danieldu@140.136.149.212:22 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/danieldu/PycharmProjects/Fed " local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
