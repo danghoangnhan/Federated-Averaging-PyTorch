@@ -1,4 +1,3 @@
-
 import concurrent
 import logging
 import os
@@ -7,6 +6,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from os import listdir
 from os.path import isfile, join
+from pathlib import Path
 
 import yaml
 from torch.utils.tensorboard import SummaryWriter
@@ -27,7 +27,7 @@ def loadConfig(filePath):
     model_config = configs[5]["model_config"]
     log_config = configs[6]["log_config"]
     # modify log_path to contain current time
-    #log_config["log_path"] = os.path.join(log_config["log_path"],str(datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")))
+    # log_config["log_path"] = os.path.join(log_config["log_path"],str(datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")))
     for config in configs:
         print(config)
         logging.info(config)
@@ -35,14 +35,26 @@ def loadConfig(filePath):
     return configs, global_config, data_config, fed_config, optim_config, init_config, model_config, log_config
 
 
+def loadConfigDir(path):
+    result = []
+    for fileName in listdir(path):
+        subPath = path+"/"+fileName
+        subPathDir = Path(subPath)
+        if isfile(subPath) and fileName.endswith(".yaml"):
+            result.append(subPath)
+        if subPathDir.is_dir():
+            result.extend(loadConfigDir(subPath))
+    return result
+
+
 if __name__ == "__main__":
     serverList = []
-    mypath = "./configs/TwoNN"
+    mypath = "./configs"
     logDir = ""
     processList = []
-    for fileName in [fileName for fileName in listdir(mypath) if isfile(join(mypath, fileName))]:
-        configs, global_config, data_config, fed_config, optim_config, init_config, model_config, log_config = loadConfig(
-            mypath + fileName)
+    filePathList = loadConfigDir(path=mypath)
+    for path in filePathList:
+        configs, global_config, data_config, fed_config, optim_config, init_config, model_config, log_config = loadConfig(path)
 
         # display and log experiment configuration
         message = "\n[WELCOME] Unfolding configurations...!"
@@ -67,10 +79,10 @@ if __name__ == "__main__":
                                 log_config)
         central_server.setup()
         serverList.append(central_server)
-        #if logDir == '':
-            #logDir = logDir.join(os.path.abspath(log_config["log_path"]))
-        #else:
-            #logDir = logDir.join(','.join(os.path.abspath(log_config["log_path"])))
+        # if logDir == '':
+        # logDir = logDir.join(os.path.abspath(log_config["log_path"]))
+        # else:
+        # logDir = logDir.join(','.join(os.path.abspath(log_config["log_path"])))
         # do federated learning
         # central_server.fit()
 

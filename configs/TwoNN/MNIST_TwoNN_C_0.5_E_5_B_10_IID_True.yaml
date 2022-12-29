@@ -35,7 +35,7 @@ model_config:
 
 ---
 log_config:
-  log_path: "./log/6"
+  log_path: "./log/14"
   log_name:  "FL.log"
   tb_port: 5252
   tb_host: "0.0.0.0"

@@ -148,9 +148,9 @@ class Server(object):
                 client.model = copy.deepcopy(self.model)
 
             message = f"[Round: {str(self._round).zfill(4)}] ...successfully transmitted models to all {str(self.num_clients)} clients!"
-            print(message);
+            print(message)
             logging.info(message)
-            del message;
+            del message
             gc.collect()
         else:
             # send the global model to selected clients
@@ -208,7 +208,7 @@ class Server(object):
         message = f"[Round: {str(self._round).zfill(4)}] Start updating selected client {str(self.clients[selected_index].id).zfill(4)}...!"
         print(message, flush=True);
         logging.info(message)
-        del message;
+        del message
         gc.collect()
 
         self.clients[selected_index].client_update()
