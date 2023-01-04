@@ -5,7 +5,7 @@ global_config:
 ---
 data_config:
   data_path: "./data/"
-  dataset_name: "MNIST"
+  dataset_name: "CIFAR10"
   num_shards: 200
   iid: True
 ---
@@ -28,14 +28,14 @@ init_config:
   gpu_ids: [0,]
 ---
 model_config:
-  name: CNN
-  in_channels: 1
+  name: CNN2
+  in_channels: 3
   hidden_channels: 32
   num_hiddens: 512
   num_classes: 10
 ---
 log_config:
-  log_path: "./log/8"
+  log_path: "./log/24"
   log_name:  "FL.log"
-  tb_port: 5252
+  tb_port: 5253
   tb_host: "0.0.0.0"
