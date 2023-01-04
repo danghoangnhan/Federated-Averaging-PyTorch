@@ -75,7 +75,6 @@ class Server(object):
         self.criterion = fed_config["criterion"]
         self.optimizer = fed_config["optimizer"]
         self.optim_config = optim_config
-        self.total_client_indices = [int(x) for x in range(self.num_clients)]
 
     def setup(self, **init_kwargs):
         """Set up all configuration for federated learning."""
@@ -274,15 +273,15 @@ class Server(object):
         sampled_client_indices = self.sample_clients()
 
         # send global model to the selected clients
-        self.transmit_model(self.total_client_indices)
+        self.transmit_model(sampled_client_indices)
 
         # updated selected clients with local dataset
         if self.mp_flag:
             with pool.ThreadPool(processes=cpu_count() - 1) as workhorse:
-                selected_total_size = workhorse.map(self.mp_update_selected_clients, self.total_client_indices)
+                selected_total_size = workhorse.map(self.mp_update_selected_clients, sampled_client_indices)
             selected_total_size = sum(selected_total_size)
         else:
-            selected_total_size = self.update_selected_clients(self.total_client_indices)
+            selected_total_size = self.update_selected_clients(sampled_client_indices)
 
         # evaluate selected clients with local dataset (same as the one used for local update)
         if self.mp_flag:

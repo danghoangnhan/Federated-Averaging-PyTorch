@@ -5,7 +5,7 @@ global_config:
 ---
 data_config:
   data_path: "./data/"
-  dataset_name: "MNIST"
+  dataset_name: "CIFAR10"
   num_shards: 200
   iid: True
 ---
@@ -25,7 +25,7 @@ optim_config:
 init_config:
   init_type: "xavier"
   init_gain: 1.0
-  gpu_ids: [1,]
+  gpu_ids: [0,]
 ---
 model_config:
   name: CNN

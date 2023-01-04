@@ -49,7 +49,7 @@ def loadConfigDir(path):
 
 if __name__ == "__main__":
     serverList = []
-    mypath = "./configs"
+    mypath = "./configs/CNN/CIFAR10"
     logDir = ""
     processList = []
     filePathList = loadConfigDir(path=mypath)
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     time.sleep(3)
     tb_thread = threading.Thread(
         target=launch_tensor_board,
-        args=(['./log/', "5252", '0.0.0.0'])
+        args=(['./log/', "5253", '0.0.0.0'])
     ).start()
     time.sleep(3.0)
     for server in serverList:

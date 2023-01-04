@@ -25,11 +25,11 @@ optim_config:
 init_config:
   init_type: "xavier"
   init_gain: 1.0
-  gpu_ids: [1,]
+  gpu_ids: [0,]
 ---
 model_config:
   name: CNN
-  in_channels: 1
+  in_channels:
   hidden_channels: 32
   num_hiddens: 512
   num_classes: 10
