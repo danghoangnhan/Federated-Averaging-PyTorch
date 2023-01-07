@@ -31,8 +31,7 @@ class CNN(nn.Module):
         self.name = name
         self.activation = nn.ReLU(True)
 
-        self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=hidden_channels, kernel_size=(5, 5), padding=1,
-                               stride=1, bias=False)
+        self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=hidden_channels, kernel_size=(5, 5), padding=1,stride=1, bias=False)
         self.conv2 = nn.Conv2d(in_channels=hidden_channels, out_channels=hidden_channels * 2, kernel_size=(5, 5),
                                padding=1, stride=1, bias=False)
 

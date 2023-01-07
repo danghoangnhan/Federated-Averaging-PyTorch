@@ -292,7 +292,7 @@ class Server(object):
             del message
             gc.collect()
 
-            with pool.ThreadPool(processes=2) as workhorse:
+            with pool.ThreadPool(processes=cpu_count() - 1) as workhorse:
                 workhorse.map(self.mp_evaluate_selected_models, sampled_client_indices)
         else:
             self.evaluate_selected_models(sampled_client_indices)

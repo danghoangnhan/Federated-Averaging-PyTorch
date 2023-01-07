@@ -4,6 +4,7 @@ import os
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
+from multiprocessing import pool
 from os import listdir
 from os.path import isfile, join
 from pathlib import Path
@@ -38,7 +39,7 @@ def loadConfig(filePath):
 def loadConfigDir(path):
     result = []
     for fileName in listdir(path):
-        subPath = path+"/"+fileName
+        subPath = path + "/" + fileName
         subPathDir = Path(subPath)
         if isfile(subPath) and fileName.endswith(".yaml"):
             result.append(subPath)
@@ -47,14 +48,19 @@ def loadConfigDir(path):
     return result
 
 
+def traingCP(server: Server):
+    server.fit()
+
+
 if __name__ == "__main__":
     serverList = []
-    mypath = "./configs/CNN/CIFAR10"
+    mypath = "./configs"
     logDir = ""
     processList = []
     filePathList = loadConfigDir(path=mypath)
     for path in filePathList:
-        configs, global_config, data_config, fed_config, optim_config, init_config, model_config, log_config = loadConfig(path)
+        configs, global_config, data_config, fed_config, optim_config, init_config, model_config, log_config = loadConfig(
+            path)
 
         # display and log experiment configuration
         message = "\n[WELCOME] Unfolding configurations...!"
@@ -72,30 +78,17 @@ if __name__ == "__main__":
         for config in configs:
             print(config)
             logging.info(config)
-        print()
-        writer = SummaryWriter(log_dir=log_config["log_path"], filename_suffix="FL")
+        writer = SummaryWriter(log_dir=os.getcwd() + "/" + log_config["log_path"], filename_suffix="FL")
         # initialize federated learning
         central_server = Server(writer, model_config, global_config, data_config, init_config, fed_config, optim_config,
                                 log_config)
         central_server.setup()
         serverList.append(central_server)
-        # if logDir == '':
-        # logDir = logDir.join(os.path.abspath(log_config["log_path"]))
-        # else:
-        # logDir = logDir.join(','.join(os.path.abspath(log_config["log_path"])))
-        # do federated learning
-        # central_server.fit()
 
     logging.info(message)
     time.sleep(3)
-    tb_thread = threading.Thread(
-        target=launch_tensor_board,
-        args=(['./log/', "5253", '0.0.0.0'])
-    ).start()
+    tb_thread = threading.Thread(target=launch_tensor_board, args=(['./log/', "5252", '0.0.0.0'])).start()
     time.sleep(3.0)
-    for server in serverList:
-        server.fit()
-    with ThreadPoolExecutor() as executor:
-        result = [executor.submit(target=server.fit()) for server in serverList]
-        for f in concurrent.futures.as_completed(result):
-            print(f.result())
+
+    with pool.ThreadPool(processes=os.cpu_count() - 1) as workhorse:
+        workhorse.map(traingCP, serverList)
