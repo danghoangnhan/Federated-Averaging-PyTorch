@@ -1,51 +1,28 @@
-#!/usr/bin/env python3
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# All rights reserved.
-#
-# This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree.
-
-"""In this tutorial, we will train an image classifier with FLSim to simulate a federated learning training environment.
-
-With this tutorial, you will learn the following key components of FLSim:
-1. Data loading
-2. Model construction
-3. Trainer construction
-
-    Typical usage example:
-    python3 cifar10_example.py --config-file configs/cifar10_config.json
-"""
-import json
 import flsim.configs  # noqa
 import hydra
+import json
 import torch
-import numpy as np
 from flsim.data.data_sharder import SequentialSharder
 from flsim.interfaces.metrics_reporter import Channel
-from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.config_utils import fl_config_from_json
+from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.example_utils import (
     DataLoader,
     DataProvider,
     FLModel,
     MetricsReporter,
-    SimpleConvNet,
 )
 from hydra.utils import instantiate
-from omegaconf import MISSING, DictConfig, OmegaConf
+from omegaconf import DictConfig, OmegaConf
 from torchvision import transforms
 from torchvision.datasets.cifar import CIFAR10
-from script.ResultToCSV import CreateHeader, CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
+
+from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
 from script.getKL import get_KL_value
 from script.non_iid import cifar10_noniid
-from model.CIFAR10_CNN import CIFAR10_CNN
-
-
+from src.model.CNN import CIFAR10_CNN
 
 IMAGE_SIZE = 32
-
-
-
 def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = False):
 
     transform = transforms.Compose(
@@ -63,7 +40,7 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
         root="../Experiment/data/cifar10", train=False, download=True, transform=transform
     )
     
-    client_num=int(len(train_dataset)/examples_per_user)
+    client_num=int(len(train_dataset)/)
 
     dict_users = cifar10_noniid(train_dataset, client_num)
     sorted_train_dataset = []

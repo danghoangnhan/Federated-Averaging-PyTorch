@@ -1,20 +1,3 @@
-#!/usr/bin/env python3
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# All rights reserved.
-#
-# This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree.
-
-"""In this tutorial, we will train an image classifier with FLSim to simulate a federated learning training environment.
-
-With this tutorial, you will learn the following key components of FLSim:
-1. Data loading
-2. Model construction
-3. Trainer construction
-
-    Typical usage example:
-    python3 cifar10_example.py --config-file configs/cifar10_config.json
-"""
 import json
 
 import flsim.configs  # noqa
@@ -35,33 +18,9 @@ from flsim.utils.example_utils import (
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torchvision import datasets, transforms
+from src.model.MLP import MNIST_MLP
 
 IMAGE_SIZE = 28
-
-
-class MLP(nn.Module):
-    def __init__(self):
-        super(MLP, self).__init__()
-        # number of hidden nodes in each layer (200)
-        hidden = 200
-
-        self.fc1 = nn.Linear(28 * 28, hidden)
-        self.fc2 = nn.Linear(hidden, 10)
-        # self.fc3 = nn.Linear(hidden_2, 10)
-
-        self.dropout = nn.Dropout(0.2)
-
-    def forward(self, x):
-        # flatten image input
-        x = x.view(-1, 28 * 28)
-        x = F.relu(self.fc1(x))
-        x = self.dropout(x)
-        x = F.relu(self.fc2(x))
-        x = self.dropout(x)
-        # x = self.fc3(x)
-        output = F.log_softmax(x, dim=1)
-        return output
-
 
 def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = False):
     transform = transforms.Compose(
@@ -94,7 +53,7 @@ def main(
 ) -> None:
     cuda_enabled = torch.cuda.is_available() and use_cuda_if_available
     device = torch.device(f"cuda:{0}" if cuda_enabled else "cpu")
-    model = MLP()
+    model = MNIST_MLP()
     # pyre-fixme[6]: Expected `Optional[str]` for 2nd param but got `device`.
     global_model = FLModel(model, device)
     assert (global_model.fl_get_module() == model)

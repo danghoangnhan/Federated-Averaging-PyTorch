@@ -1,20 +1,4 @@
-#!/usr/bin/env python3
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# All rights reserved.
-#
-# This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree.
 
-"""In this tutorial, we will train an image classifier with FLSim to simulate a federated learning training environment.
-
-With this tutorial, you will learn the following key components of FLSim:
-1. Data loading
-2. Model construction
-3. Trainer construction
-
-    Typical usage example:
-    python3 cifar10_example.py --config-file configs/cifar10_config.json
-"""
 import json
 import flsim.configs  # noqa
 import hydra

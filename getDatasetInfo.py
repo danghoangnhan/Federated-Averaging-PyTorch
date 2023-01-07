@@ -13,12 +13,8 @@ transform = transforms.Compose(
         transforms.Normalize((0.1307,), (0.3081,)),
     ]
 )
-train_dataset = datasets.MNIST(
-    root="../Experiment/data/MNIST", train=True, download=True, transform=transform
-)
-test_dataset = datasets.MNIST(
-    root="../Experiment/data/MNIST", train=False, download=True, transform=transform
-)
+train_dataset = datasets.MNIST(root="../Experiment/data/MNIST", train=True, download=True, transform=transform)
+test_dataset = datasets.MNIST(root="../Experiment/data/MNIST", train=False, download=True, transform=transform)
 
 # train_dataset[0][0].numpy()
 print(len(train_dataset))
