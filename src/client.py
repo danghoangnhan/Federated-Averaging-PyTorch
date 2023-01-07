@@ -22,6 +22,7 @@ class Client(object):
         device: Training machine indicator (e.g. "cpu", "cuda").
         __model: torch.nn instance as a local model.
     """
+
     def __init__(self, client_id, local_data, device):
         """Client object is initiated by the center server."""
         self.id = client_id
@@ -60,15 +61,15 @@ class Client(object):
         for e in range(self.local_epoch):
             for data, labels in self.dataloader:
                 data, labels = data.float().to(self.device), labels.long().to(self.device)
-  
+
                 optimizer.zero_grad()
                 outputs = self.model(data)
                 loss = eval(self.criterion)()(outputs, labels)
 
                 loss.backward()
-                optimizer.step() 
+                optimizer.step()
 
-                if self.device == "cuda": torch.cuda.empty_cache()               
+                if self.device == "cuda": torch.cuda.empty_cache()
         self.model.to("cpu")
 
     def client_evaluate(self):
@@ -82,7 +83,7 @@ class Client(object):
                 data, labels = data.float().to(self.device), labels.long().to(self.device)
                 outputs = self.model(data)
                 test_loss += eval(self.criterion)()(outputs, labels).item()
-                
+
                 predicted = outputs.argmax(dim=1, keepdim=True)
                 correct += predicted.eq(labels.view_as(predicted)).sum().item()
 
@@ -95,7 +96,9 @@ class Client(object):
         message = f"\t[Client {str(self.id).zfill(4)}] ...finished evaluation!\
             \n\t=> Test loss: {test_loss:.4f}\
             \n\t=> Test accuracy: {100. * test_accuracy:.2f}%\n"
-        print(message, flush=True); logging.info(message)
-        del message; gc.collect()
+        print(message, flush=True);
+        logging.info(message)
+        del message;
+        gc.collect()
 
         return test_loss, test_accuracy

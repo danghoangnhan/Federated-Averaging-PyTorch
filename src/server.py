@@ -205,7 +205,7 @@ class Server(object):
         """Multiprocessing-applied version of "update_selected_clients" method."""
         # update selected clients
         message = f"[Round: {str(self._round).zfill(4)}] Start updating selected client {str(self.clients[selected_index].id).zfill(4)}...!"
-        print(message, flush=True);
+        print(message, flush=True)
         logging.info(message)
         del message
         gc.collect()
