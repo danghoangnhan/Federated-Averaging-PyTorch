@@ -13,7 +13,7 @@ from flsim.utils.example_utils import (
     MetricsReporter,
 )
 from hydra.utils import instantiate
-from model.MNIST_MLP import MNIST_MLP
+from src.model.MLP import MNIST_MLP
 from omegaconf import DictConfig, OmegaConf
 from torchvision import datasets, transforms
 
@@ -46,7 +46,6 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
         root="./data/Experiment/data/MNIST", train=False, download=True, transform=transform
     )
     client_num=num_of_original_client
-    #print(client_num)
     #divide train dataset(non-iid)
 
     dict_users = mnist_noniid(train_dataset, client_num)
@@ -57,9 +56,7 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
 
     #merge train dataset
     sorted_train_dataset = []
-    #print(len(dict_users[0]))
     for k in range(num_of_head_client):
-         
         for i in range(len(index_of_head_group[k])):
             client_index = index_of_head_group[k][i]
             for j in range(len(dict_users[client_index])):
@@ -108,20 +105,12 @@ def main(
         examples_per_user=data_config.examples_per_user,
         drop_last=False,
     )
-    
-    #print(trainer_config)
-    #print(data_config)
+
     
     metrics_reporter = MetricsReporter([Channel.TENSORBOARD, Channel.STDOUT])
     
     trainer = instantiate(trainer_config, model=global_model, cuda_enabled=cuda_enabled)
-    
-    #print(global_model)
-    #print(model)
-    #print(device)
-    #print(data_provider)
-    #print(metrics_reporter)
-    #print(data_provider.num_train_users())
+
     final_model, eval_score = trainer.train(
         data_provider=data_provider,
         metrics_reporter=metrics_reporter,
@@ -135,8 +124,6 @@ def main(
     )
     accuracy_of_each_epoch = metrics_reporter.AccuracyList
     best_accuracy_of_each_epoch = max(accuracy_of_each_epoch)
-    #print("Accuracy list:",accuracy_of_each_epoch)
-    #print("Best Accuracy:",best_accuracy_of_each_epoch)
 
     Save_Accuracy_of_each_epoch(1, "FL_non_IID_Heuristic_MNIST(MLP)", accuracy_of_each_epoch,best_accuracy_of_each_epoch)
     client_num=num_of_original_client

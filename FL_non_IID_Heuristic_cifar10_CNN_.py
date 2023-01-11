@@ -24,13 +24,12 @@ from configs.ILP_Heuristic_method_parameter import (
     num_of_head_client,
     num_of_CIFAR10_label,
 )
-from src.model.CNN import CIFAR10_CNN
 from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
 from script.getKL import get_KL_value
 from script.non_iid import (
     cifar10_noniid,
 )
-from algorithm.Heuristic_Algorithm import heuristic_method
+from src.model.CNN import CIFAR10_CNN
 
 IMAGE_SIZE = 32
 total_execution_time = 0

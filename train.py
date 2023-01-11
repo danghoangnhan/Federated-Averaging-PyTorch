@@ -33,7 +33,7 @@ os.system('python FL_non_IID_cifar10(CNN).py')
 
 os.system('python FL_non_IID_Heuristic_MNIST_MLP_.py')
 
-os.system('python FL_non_IID_Heuristic_MNIST(CNN).py')
+os.system('python FL_non_IID_Heuristic_MNIST_CNN_.py')
 
 os.system('python FL_non_IID_Heuristic_cifar10_CNN_.py')
 

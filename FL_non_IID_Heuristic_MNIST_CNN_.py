@@ -1,7 +1,3 @@
-<<<<<<< HEAD:FL_non_IID_Heuristic_MNIST(CNN).py
-=======
-
->>>>>>> cb1e6255808b75fd8362b4d74d45ff41eb9e1062:configs/FL_non_IID_Heuristic_MNIST(CNN).py
 import json
 
 import flsim.configs  # noqa
@@ -27,7 +23,7 @@ from configs.ILP_Heuristic_method_parameter import (
     num_of_head_client,
     num_of_MNIST_label,
 )
-from model.MNIST_CNN import MNIST_CNN
+from src.model.CNN import MNIST_CNN
 from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
 from script.getKL import get_KL_value
 from script.non_iid import mnist_noniid
