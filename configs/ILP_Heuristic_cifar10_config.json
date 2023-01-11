@@ -1,7 +1,7 @@
 {
     "trainer": {
       "_base_": "base_sync_trainer",
-      "epochs": 5,
+      "epochs": 500,
       "server": {
         "_base_": "base_sync_server",
         "server_optimizer": {
@@ -14,14 +14,14 @@
         }
       },
       "client": {
-        "epochs": 1,
+        "epochs": 500,
         "optimizer": {
           "_base_": "base_optimizer_sgd",
           "lr": 0.0138,
           "momentum": 0
         }
       },
-      "users_per_round": 20,
+      "users_per_round": 50,
       "train_metrics_reported_per_epoch": 1,
       "always_keep_trained_model": false,
       "report_train_metrics": true,

@@ -31,11 +31,11 @@ os.system('python FL_non_IID_MNIST(CNN).py')
 
 os.system('python FL_non_IID_cifar10(CNN).py')
 
-os.system('python FL_non_IID_Heuristic_MNIST(MLP).py')
+os.system('python FL_non_IID_Heuristic_MNIST_MLP_.py')
 
 os.system('python FL_non_IID_Heuristic_MNIST(CNN).py')
 
-os.system('python FL_non_IID_Heuristic_cifar10(CNN).py')
+os.system('python FL_non_IID_Heuristic_cifar10_CNN_.py')
 
 os.system('python FL_non_IID_ILP_MNIST(MLP).py')
 

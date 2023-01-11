@@ -63,10 +63,10 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
         ]
     )
     train_dataset = datasets.MNIST(
-        root="../Experiment/data/MNIST", train=True, download=True, transform=transform
+        root="./data/Experiment/data/MNIST", train=True, download=True, transform=transform
     )
     test_dataset = datasets.MNIST(
-        root="../Experiment/data/MNIST", train=False, download=True, transform=transform
+        root="./data/Experiment/data/MNIST", train=False, download=True, transform=transform
     )
     client_num=num_of_original_client
     #print(client_num)
