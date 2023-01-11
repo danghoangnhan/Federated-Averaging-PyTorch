@@ -1,55 +1,32 @@
-#!/usr/bin/env python3
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# All rights reserved.
-#
-# This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree.
-
-"""In this tutorial, we will train an image classifier with FLSim to simulate a federated learning training environment.
-
-With this tutorial, you will learn the following key components of FLSim:
-1. Data loading
-2. Model construction
-3. Trainer construction
-
-    Typical usage example:
-    python3 cifar10_example.py --config-file configs/cifar10_config.json
-"""
 import json
 import flsim.configs  # noqa
 import hydra
-import numpy as np
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
 from flsim.data.data_sharder import SequentialSharder
-from flsim.data.data_sharder import RandomSharder
 from flsim.interfaces.metrics_reporter import Channel
-from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.config_utils import fl_config_from_json
+from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.example_utils import (
     DataLoader,
     DataProvider,
     FLModel,
     MetricsReporter,
-    SimpleConvNet,
 )
 from hydra.utils import instantiate
-from omegaconf import MISSING, DictConfig, OmegaConf
-from torchvision import datasets,transforms
-from torch import Tensor
-from script.ResultToCSV import CreateHeader, CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
-from script.getKL import get_KL_value
-from script.non_iid import mnist_noniid
 from model.MNIST_MLP import MNIST_MLP
+from omegaconf import DictConfig, OmegaConf
+from torchvision import datasets, transforms
+
+from algorithm.Heuristic_Algorithm import heuristic_method
 from configs.ILP_Heuristic_method_parameter import (
     num_of_original_client,
     num_of_head_client,
-    data_size_of_original_MNIST_client, 
     num_of_MNIST_label,
-    Max_value_of_ILP,           
 )
-from algorithm.Heuristic_Algorithm import heuristic_method
+from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
+from script.getKL import get_KL_value
+from script.non_iid import mnist_noniid
+
 IMAGE_SIZE = 28
 total_execution_time = 0
 def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = False):

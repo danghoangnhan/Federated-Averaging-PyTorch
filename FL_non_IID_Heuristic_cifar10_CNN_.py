@@ -24,10 +24,13 @@ from configs.ILP_Heuristic_method_parameter import (
     num_of_head_client,
     num_of_CIFAR10_label,
 )
-from model.CIFAR10_CNN import CIFAR10_CNN
+from src.model.CNN import CIFAR10_CNN
 from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
 from script.getKL import get_KL_value
-from script.non_iid import cifar10_noniid
+from script.non_iid import (
+    cifar10_noniid,
+)
+from algorithm.Heuristic_Algorithm import heuristic_method
 
 IMAGE_SIZE = 32
 total_execution_time = 0
@@ -110,9 +113,7 @@ def main(
     )
 
     metrics_reporter = MetricsReporter([Channel.TENSORBOARD, Channel.STDOUT])
-
     trainer = instantiate(trainer_config, model=global_model, cuda_enabled=cuda_enabled)
-
     final_model, eval_score = trainer.train(
         data_provider=data_provider,
         metrics_reporter=metrics_reporter,
@@ -126,7 +127,6 @@ def main(
     )
     accuracy_of_each_epoch = metrics_reporter.AccuracyList
     best_accuracy_of_each_epoch = max(accuracy_of_each_epoch)
-
     Save_Accuracy_of_each_epoch(1, "FL_non_IID_Heuristic_cifar10(CNN)", accuracy_of_each_epoch,
                                 best_accuracy_of_each_epoch)
     client_num = num_of_original_client

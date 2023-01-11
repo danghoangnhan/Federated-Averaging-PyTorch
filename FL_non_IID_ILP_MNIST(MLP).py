@@ -1,20 +1,3 @@
-#!/usr/bin/env python3
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# All rights reserved.
-#
-# This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree.
-
-"""In this tutorial, we will train an image classifier with FLSim to simulate a federated learning training environment.
-
-With this tutorial, you will learn the following key components of FLSim:
-1. Data loading
-2. Model construction
-3. Trainer construction
-
-    Typical usage example:
-    python3 cifar10_example.py --config-file configs/cifar10_config.json
-"""
 import json
 import flsim.configs  # noqa
 import hydra
@@ -41,7 +24,7 @@ from torch import Tensor
 from script.ResultToCSV import CreateHeader, CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
 from script.getKL import get_KL_value
 from script.non_iid import mnist_noniid
-from model.MNIST_MLP import MNIST_MLP
+from src.model.MLP import MNIST_MLP
 from configs.ILP_Heuristic_method_parameter import (
     num_of_original_client,
     num_of_head_client,
@@ -64,20 +47,18 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
             transforms.Normalize((0.1307,), (0.3081,)),
         ]
     )
-    train_dataset = datasets.MNIST(
-        root="../Experiment/data/MNIST", train=True, download=True, transform=transform
-    )
-    test_dataset = datasets.MNIST(
-        root="../Experiment/data/MNIST", train=False, download=True, transform=transform
-    )
+
+    train_dataset = datasets.MNIST(root="../Experiment/data/MNIST", train=True, download=True, transform=transform)
+    test_dataset = datasets.MNIST(root="../Experiment/data/MNIST", train=False, download=True, transform=transform)
+
     client_num = num_of_original_client
     # print(client_num)
     # divide train dataset(non-iid)
 
     dict_users = mnist_noniid(train_dataset, client_num)
 
-    index_of_head_group, time = ILP_method(train_dataset, num_of_MNIST_label, dict_users, client_num,
-                                           num_of_head_client, Max_value_of_ILP)
+    index_of_head_group, time = ILP_method(train_dataset, num_of_MNIST_label, dict_users, client_num,num_of_head_client, Max_value_of_ILP)
+
     global total_execution_time
     total_execution_time = total_execution_time + time
     # merge train dataset

@@ -1,3 +1,7 @@
+<<<<<<< HEAD:FL_non_IID_Heuristic_MNIST(CNN).py
+=======
+
+>>>>>>> cb1e6255808b75fd8362b4d74d45ff41eb9e1062:configs/FL_non_IID_Heuristic_MNIST(CNN).py
 import json
 
 import flsim.configs  # noqa
