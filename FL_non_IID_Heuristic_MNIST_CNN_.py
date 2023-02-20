@@ -108,8 +108,6 @@ def main(
         drop_last=False,
     )
 
-
-
     metrics_reporter = MetricsReporter([Channel.TENSORBOARD, Channel.STDOUT])
 
     trainer = instantiate(trainer_config, model=global_model, cuda_enabled=cuda_enabled)
@@ -146,6 +144,7 @@ def run(cfg: DictConfig) -> None:
         trainer_config,
         data_config
     )
+
 
 if __name__ == "__main__":
     f = open('configs/ILP_Heuristic_MNIST_config.json')

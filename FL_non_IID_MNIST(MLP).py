@@ -5,7 +5,6 @@ import torch
 from flsim.data.data_sharder import SequentialSharder
 from flsim.interfaces.metrics_reporter import Channel
 from flsim.utils.config_utils import fl_config_from_json
-from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.example_utils import (
     DataLoader,
     DataProvider,
@@ -40,11 +39,8 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
         root="../Experiment/data/MNIST", train=False, download=True, transform=transform
     )
     client_num = int(len(train_dataset) / examples_per_user)
-    # print(client_num)
-    # divide train dataset(non-iid)
     dict_users = mnist_noniid(train_dataset, client_num)
     sorted_train_dataset = []
-    # print(len(dict_users[0]))
 
     # merge train dataset
     for k in range(client_num):
@@ -93,19 +89,10 @@ def main(
         drop_last=False,
     )
 
-    # print(trainer_config)
-    # print(data_config)
-
-    metrics_reporter = MetricsReporter([Channel.TENSORBOARD, Channel.STDOUT])
+    metrics_reporter: MetricsReporter = MetricsReporter([Channel.TENSORBOARD, Channel.STDOUT])
 
     trainer = instantiate(trainer_config, model=global_model, cuda_enabled=cuda_enabled)
 
-    # print(global_model)
-    # print(model)
-    # print(device)
-    # print(data_provider)
-    # print(metrics_reporter)
-    # print(data_provider.num_train_users())
     final_model, eval_score = trainer.train(
         data_provider=data_provider,
         metrics_reporter=metrics_reporter,
@@ -119,8 +106,6 @@ def main(
     )
     accuracy_of_each_epoch = metrics_reporter.AccuracyList
     best_accuracy_of_each_epoch = max(accuracy_of_each_epoch)
-    # print("Accuracy list:",accuracy_of_each_epoch)
-    # print("Best Accuracy:",best_accuracy_of_each_epoch)
 
     Save_Accuracy_of_each_epoch(1, "FL_non_IID_MNIST(MLP)", accuracy_of_each_epoch, best_accuracy_of_each_epoch)
     client_num = data_provider.num_train_users()
@@ -144,8 +129,6 @@ if __name__ == "__main__":
     f = open('configs/MNIST_config.json')
     data = json.load(f)
     json_cfg = fl_config_from_json(data)
-    # print(cfg1)
-    cfg = maybe_parse_json_config()
     cfg = OmegaConf.create(json_cfg)
 
     run(cfg)

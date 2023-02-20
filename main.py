@@ -1,12 +1,10 @@
-import concurrent
 import logging
 import os
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import pool
 from os import listdir
-from os.path import isfile, join
+from os.path import isfile
 from pathlib import Path
 
 import yaml
@@ -54,7 +52,7 @@ def traingCP(server: Server):
 
 if __name__ == "__main__":
     serverList = []
-    mypath = "./configs"
+    mypath = "./configs/TwoNN/MNIST"
     logDir = ""
     processList = []
     filePathList = loadConfigDir(path=mypath)
@@ -85,7 +83,6 @@ if __name__ == "__main__":
         central_server.setup()
         serverList.append(central_server)
 
-    logging.info(message)
     time.sleep(3)
     tb_thread = threading.Thread(target=launch_tensor_board, args=(['./log/', "5252", '0.0.0.0'])).start()
     time.sleep(3.0)

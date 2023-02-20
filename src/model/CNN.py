@@ -1,14 +1,6 @@
-import json
-import hydra
 import torch
-from hydra.utils import instantiate
-from omegaconf import MISSING, DictConfig, OmegaConf
-from torchvision import transforms
-from torchvision.datasets.cifar import CIFAR10
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
-import numpy as np
 
 
 # model for Fl simulated
@@ -74,6 +66,7 @@ class MNIST_CNN(nn.Module):
         output = F.log_softmax(x, dim=1)
         return output
 
+
 # McMahan et al., 2016; 1,663,370 parameters
 class CNN(nn.Module):
     def __init__(self, name, in_channels, hidden_channels, num_hiddens, num_classes):
@@ -81,7 +74,8 @@ class CNN(nn.Module):
         self.name = name
         self.activation = nn.ReLU(True)
 
-        self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=hidden_channels, kernel_size=(5, 5), padding=1,stride=1, bias=False)
+        self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=hidden_channels, kernel_size=(5, 5), padding=1,
+                               stride=1, bias=False)
         self.conv2 = nn.Conv2d(in_channels=hidden_channels, out_channels=hidden_channels * 2, kernel_size=(5, 5),
                                padding=1, stride=1, bias=False)
 

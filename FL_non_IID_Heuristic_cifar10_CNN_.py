@@ -6,7 +6,6 @@ import torch
 from flsim.data.data_sharder import SequentialSharder
 from flsim.interfaces.metrics_reporter import Channel
 from flsim.utils.config_utils import fl_config_from_json
-from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.example_utils import (
     DataLoader,
     DataProvider,
@@ -61,9 +60,7 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
 
     # merge train dataset
     sorted_train_dataset = []
-    # print(len(dict_users[0]))
     for k in range(num_of_head_client):
-
         for i in range(len(index_of_head_group[k])):
             client_index = index_of_head_group[k][i]
             for j in range(len(dict_users[client_index])):
@@ -97,7 +94,7 @@ def main(
         use_cuda_if_available: bool = True,
 ) -> None:
     cuda_enabled = torch.cuda.is_available() and use_cuda_if_available
-    device = torch.device(f"cuda:{0}" if cuda_enabled else "cpu")
+    device = torch.device(f"cuda:{1}" if cuda_enabled else "cpu")
     model = CIFAR10_CNN()
     # pyre-fixme[6]: Expected `Optional[str]` for 2nd param but got `device`.
     global_model = FLModel(model, device)
@@ -124,13 +121,14 @@ def main(
         data_provider=data_provider,
         metrics_reporter=MetricsReporter([Channel.STDOUT]),
     )
-    accuracy_of_each_epoch = metrics_reporter.AccuracyList
+    accuracy_of_each_epoch = metrics_reporter.ACCURACY
     best_accuracy_of_each_epoch = max(accuracy_of_each_epoch)
     Save_Accuracy_of_each_epoch(1, "FL_non_IID_Heuristic_cifar10(CNN)", accuracy_of_each_epoch,
                                 best_accuracy_of_each_epoch)
     client_num = num_of_original_client
     global total_execution_time
-    CreateResultData("FL_non_IID_Heuristic_cifar10(CNN)", "CIFAR10", "CNN", "non-IID -> IID", client_num,int(trainer_config.epochs), eval_score['Accuracy'], total_execution_time)
+    CreateResultData("FL_non_IID_Heuristic_cifar10(CNN)", "CIFAR10", "CNN", "non-IID -> IID", client_num,
+                     int(trainer_config.epochs), eval_score['Accuracy'], total_execution_time)
 
 
 @hydra.main(config_path="configs", config_name="cifar10_config", version_base="1.2")
@@ -147,7 +145,5 @@ def run(cfg: DictConfig) -> None:
 if __name__ == "__main__":
     f = open('configs/ILP_Heuristic_cifar10_config.json')
     data = json.load(f)
-    json_cfg = fl_config_from_json(data)
-    cfg = maybe_parse_json_config()
-    cfg = OmegaConf.create(json_cfg)
+    cfg = OmegaConf.create(fl_config_from_json(data))
     run(cfg)

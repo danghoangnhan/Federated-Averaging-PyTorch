@@ -91,7 +91,7 @@ def main(
     use_cuda_if_available: bool = True,
 ) -> None:
     cuda_enabled = torch.cuda.is_available() and use_cuda_if_available
-    device = torch.device(f"cuda:{0}" if cuda_enabled else "cpu")
+    device = torch.device(f"cuda:{1}" if cuda_enabled else "cpu")
     model = MNIST_MLP()
     # pyre-fixme[6]: Expected `Optional[str]` for 2nd param but got `device`.
     global_model = FLModel(model, device)
@@ -148,7 +148,6 @@ if __name__ == "__main__":
     f = open('configs/ILP_Heuristic_MNIST_config.json')
     data = json.load(f)
     json_cfg = fl_config_from_json(data)
-    #print(cfg1)
     cfg = maybe_parse_json_config()
     cfg=OmegaConf.create(json_cfg)
 

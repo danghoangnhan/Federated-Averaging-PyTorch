@@ -8,7 +8,8 @@ from tqdm.auto import tqdm
 
 from .client import Client
 from .utils import *
-from src.model.TwoNN import *
+from src.model.TwoNN import TwoNN
+from src.model.CNN import CNN, CNN2
 
 
 class Server(object):
