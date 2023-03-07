@@ -17,18 +17,16 @@ from omegaconf import DictConfig, OmegaConf
 from torchvision import transforms
 from torchvision.datasets.cifar import CIFAR10
 
-from src.algorithm.Heuristic import heuristic_method
 from configs.ILP_Heuristic_method_parameter import (
     num_of_original_client,
     num_of_head_client,
     num_of_CIFAR10_label,
 )
-from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
-from script.getKL import get_KL_value
-from script.non_iid import (
-    cifar10_noniid,
-)
+from script.ResultToCSV import CreateResultData, Save_Accuracy_of_each_epoch
+from script.getKL import saveKL
+from src.algorithm.Heuristic import heuristic_method
 from src.model.CNN import CIFAR10_CNN
+from src.sampling import cifar_noniid
 
 IMAGE_SIZE = 32
 total_execution_time = 0
@@ -44,17 +42,27 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
         ]
     )
     train_dataset = CIFAR10(
-        root="./data/Experiment/data/cifar10", train=True, download=True, transform=transform
+        root="./data/Experiment/data/cifar10",
+        train=True,
+        download=True,
+        transform=transform
     )
     test_dataset = CIFAR10(
-        root="./data/Experiment/data/cifar10", train=False, download=True, transform=transform
+        root="./data/Experiment/data/cifar10",
+        train=False,
+        download=True,
+        transform=transform
     )
 
     client_num = num_of_original_client
 
-    dict_users = cifar10_noniid(train_dataset, client_num)
-    index_of_head_group, time = heuristic_method(train_dataset, num_of_CIFAR10_label, dict_users, client_num,
-                                                 num_of_head_client)
+    dict_users = cifar_noniid(train_dataset, client_num)
+    index_of_head_group, time = heuristic_method(train_dataset,
+                                                 num_of_CIFAR10_label,
+                                                 dict_users,
+                                                 client_num,
+                                                 num_of_head_client
+                                                 )
     global total_execution_time
     total_execution_time = total_execution_time + time
 
@@ -67,15 +75,11 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
                 data_index = int(dict_users[client_index][j])
                 sorted_train_dataset.append(train_dataset[data_index])
 
-    num_of_client = int(len(train_dataset) / examples_per_user)
-
-    KL_of_each_client, avg_KL = get_KL_value(
-        sorted_train_dataset,
-        num_of_CIFAR10_label,
-        num_of_client
-    )
-
-    Save_KL_Result("FL_non_IID_Heuristic_cifar10(CNN)", KL_of_each_client, avg_KL)
+    saveKL(train_dataset=sorted_train_dataset,
+           label=num_of_CIFAR10_label,
+           num_of_client=int(len(train_dataset) / examples_per_user),
+           fileName="FL_non_IID_Heuristic_cifar10(CNN)"
+           )
 
     sharder = SequentialSharder(examples_per_shard=examples_per_user)
 

@@ -1,6 +1,7 @@
+import json
+
 import flsim.configs  # noqa
 import hydra
-import json
 import torch
 from flsim.data.data_sharder import SequentialSharder
 from flsim.interfaces.metrics_reporter import Channel
@@ -17,10 +18,10 @@ from omegaconf import DictConfig, OmegaConf
 from torchvision import transforms
 from torchvision.datasets.cifar import CIFAR10
 
-from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
-from script.getKL import get_KL_value
-from script.non_iid import cifar10_noniid
+from script.ResultToCSV import CreateResultData, Save_Accuracy_of_each_epoch
+from script.getKL import saveKL
 from src.model.CNN import CIFAR10_CNN
+from src.sampling import cifar_noniid
 
 IMAGE_SIZE = 32
 
@@ -43,7 +44,7 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
 
     client_num = int(len(train_dataset) / examples_per_user)
 
-    dict_users = cifar10_noniid(train_dataset, client_num)
+    dict_users = cifar_noniid(train_dataset, client_num)
     sorted_train_dataset = []
 
     for k in range(client_num):
@@ -51,9 +52,12 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
             index = int(dict_users[k][i])
             sorted_train_dataset.append(train_dataset[index])
 
-    KL_of_each_client, avg_KL = get_KL_value(sorted_train_dataset, 10, client_num)
+    saveKL(train_dataset=sorted_train_dataset,
+           label=10,
+           num_of_client=int(len(train_dataset) / examples_per_user),
+           fileName="FL_non_IID_cifar10(CNN)"
+           )
 
-    Save_KL_Result("FL_non_IID_cifar10(CNN)", KL_of_each_client, avg_KL)
     sharder = SequentialSharder(examples_per_shard=examples_per_user)
     fl_data_loader = DataLoader(
         sorted_train_dataset, test_dataset, test_dataset, sharder, local_batch_size, drop_last

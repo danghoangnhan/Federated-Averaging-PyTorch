@@ -1,31 +1,12 @@
-import os
-import torch
-import numpy as np
-import torchvision
-from torch import nn
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
-import torch
-from torch import Tensor
-from torch import arange
-import matplotlib.pyplot as plt
 import math
 import time
+from script.getKL import get_KL_value
 
-
-def KL_of_combination(num_of_label, total_dataset_size, P_i, P_j, Q):
-    # P_i,P_j => list.
-
-    KL = 0
-    for i in range(num_of_label):
-        P = (P_i[i] + P_j[i]) / total_dataset_size
-        if P != 0:
-            result_of_division = P / Q
-            KL = KL + (P * math.log(result_of_division, 2))
-    return KL
-
-
-def heuristic_method(train_dataset, num_of_label, client_data_index, original_client_num, head_num):
+def heuristic_method(train_dataset,
+                     num_of_label,
+                     client_data_index,
+                     original_client_num,
+                     head_num):
     total_time = 0
 
     # client information
@@ -60,11 +41,6 @@ def heuristic_method(train_dataset, num_of_label, client_data_index, original_cl
             index_lsit.append(int(client_data_index[i][j]))
 
         indexs_of_clients.append(index_lsit)
-
-    # print(len(indexs_of_clients))
-    # print(len(indexs_of_clients[0]))
-    # print(indexs_of_clients[0])
-    # print(len(indexs_of_clients[99]))
 
     # Counting the number of labels of each client
     for i in range(num_of_client):
@@ -117,17 +93,6 @@ def heuristic_method(train_dataset, num_of_label, client_data_index, original_cl
                 member_index.remove(index_of_head)
                 break
 
-    # print(len(head_index))
-    # print(len(member_index))
-    # print(head_index)
-    # print(member_index)
-
-    # for i in range(len(head_index)):
-    # print(KL_of_each_client[head_index[i]])
-    # print("member")
-    # for i in range(len(member_index)):
-    # print(KL_of_each_client[member_index[i]])
-
     ####heuristic algorithm
     final_size = int(len(train_dataset) / num_of_head)
     total_round = int((final_size - head_size) / member_size)
@@ -155,8 +120,12 @@ def heuristic_method(train_dataset, num_of_label, client_data_index, original_cl
                     P_i_list[t] = P_i_list[t] + nums_of_labels_of_each_client[head_index_group[i][j]][t]
             for j in range(len(unassigned_member_index)):
                 P_j_list = nums_of_labels_of_each_client[unassigned_member_index[j]]
-                KL = KL_of_combination(label_num, size_of_combination_head + member_size, P_i_list, P_j_list,
-                                       distribution_Q)
+                KL = get_KL_value(label_num,
+                                       size_of_combination_head + member_size,
+                                       P_i_list,
+                                       P_j_list,
+                                       distribution_Q
+                                       )
                 KL_list.append(KL)
 
             # find the member with the lowest KL

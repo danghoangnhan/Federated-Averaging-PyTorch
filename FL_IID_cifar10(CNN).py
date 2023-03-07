@@ -1,26 +1,26 @@
 import json
+
 import flsim.configs  # noqa
 import hydra
 import torch
 from flsim.data.data_sharder import SequentialSharder
 from flsim.interfaces.metrics_reporter import Channel
-from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.config_utils import fl_config_from_json
+from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.example_utils import (
     DataLoader,
     DataProvider,
     FLModel,
     MetricsReporter,
-    SimpleConvNet,
 )
 from hydra.utils import instantiate
-from omegaconf import MISSING, DictConfig, OmegaConf
+from omegaconf import DictConfig, OmegaConf
 from torchvision import transforms
 from torchvision.datasets.cifar import CIFAR10
-from script.ResultToCSV import CreateHeader, CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
-from script.getKL import get_KL_value
 
-from model.CIFAR10_CNN import CIFAR10_CNN
+from script.ResultToCSV import CreateResultData, Save_Accuracy_of_each_epoch
+from script.getKL import saveKL
+from src.model.CNN import CIFAR10_CNN
 
 IMAGE_SIZE = 32
 
@@ -40,12 +40,11 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
     test_dataset = CIFAR10(
         root="../Experiment/data/cifar10", train=False, download=True, transform=transform
     )
-    client_num = int(len(train_dataset) / examples_per_user)
-
-    KL_of_each_client, avg_KL = get_KL_value(train_dataset, 10, client_num)
-
-    Save_KL_Result("FL_IID_cifar10(CNN)", KL_of_each_client, avg_KL)
-
+    saveKL(train_dataset=train_dataset,
+           label=10,
+           num_of_client=int(len(train_dataset) / examples_per_user),
+           fileName="FL_IID_cifar10(CNN)"
+           )
     sharder = SequentialSharder(examples_per_shard=examples_per_user)
     fl_data_loader = DataLoader(
         train_dataset,

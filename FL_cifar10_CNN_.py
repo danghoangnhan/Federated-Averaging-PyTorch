@@ -1,28 +1,12 @@
-#!/usr/bin/env python3
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# All rights reserved.
-#
-# This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree.
-
-"""In this tutorial, we will train an image classifier with FLSim to simulate a federated learning training environment.
-
-With this tutorial, you will learn the following key components of FLSim:
-1. Data loading
-2. Model construction
-3. Trainer construction
-
-    Typical usage example:
-    python3 cifar10_example.py --config-file configs/cifar10_config.json
-"""
 import json
+
 import flsim.configs  # noqa
 import hydra
 import torch
 from flsim.data.data_sharder import SequentialSharder
 from flsim.interfaces.metrics_reporter import Channel
-from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.config_utils import fl_config_from_json
+from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.example_utils import (
     DataLoader,
     DataProvider,
@@ -31,11 +15,9 @@ from flsim.utils.example_utils import (
     SimpleConvNet,
 )
 from hydra.utils import instantiate
-from omegaconf import MISSING, DictConfig, OmegaConf
+from omegaconf import DictConfig, OmegaConf
 from torchvision import transforms
 from torchvision.datasets.cifar import CIFAR10
-
-
 
 IMAGE_SIZE = 32
 
@@ -92,13 +74,7 @@ def main(
     metrics_reporter = MetricsReporter([Channel.TENSORBOARD, Channel.STDOUT])
     
     trainer = instantiate(trainer_config, model=global_model, cuda_enabled=cuda_enabled)
-    
-    #print(global_model)
-    #print(model)
-    #print(device)
-    #print(data_provider)
-    #print(metrics_reporter)
-    #print(data_provider.num_train_users())
+
     final_model, eval_score = trainer.train(
         data_provider=data_provider,
         metrics_reporter=metrics_reporter,

@@ -24,8 +24,8 @@ from configs.ILP_Heuristic_method_parameter import (
     Max_value_of_ILP,
 )
 from src.model.CNN import MNIST_CNN
-from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
-from script.getKL import get_KL_value
+from script.ResultToCSV import CreateResultData, Save_Accuracy_of_each_epoch
+from script.getKL import get_KL_value, saveKL
 from src.sampling import mnist_noniid
 
 IMAGE_SIZE = 28
@@ -67,11 +67,13 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
             for j in range(len(dict_users[client_index])):
                 data_index=int(dict_users[client_index][j])
                 sorted_train_dataset.append(train_dataset[data_index])
-    num_of_client = int(len(train_dataset)/examples_per_user)
 
-    KL_of_each_client, avg_KL = get_KL_value(sorted_train_dataset, num_of_MNIST_label, num_of_client)
+    saveKL(train_dataset=sorted_train_dataset,
+           label=num_of_MNIST_label,
+           num_of_client=int(len(train_dataset) / examples_per_user),
+           fileName="FL_non_IID_ILP_MNIST(CNN)"
+           )
 
-    Save_KL_Result("FL_non_IID_ILP_MNIST(CNN)", KL_of_each_client, avg_KL)
     #get the amount of each class
     num_of_class_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 

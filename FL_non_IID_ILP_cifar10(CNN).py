@@ -19,7 +19,7 @@ from omegaconf import MISSING, DictConfig, OmegaConf
 from torchvision import transforms
 from torchvision.datasets.cifar import CIFAR10
 from script.ResultToCSV import CreateHeader, CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
-from script.getKL import get_KL_value
+from script.getKL import get_KL_value, saveKL
 from script.non_iid import cifar10_noniid
 from model.CIFAR10_CNN import CIFAR10_CNN
 from configs.ILP_Heuristic_method_parameter import (
@@ -70,11 +70,11 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
                 data_index = int(dict_users[client_index][j])
                 sorted_train_dataset.append(train_dataset[data_index])
 
-    num_of_client = int(len(train_dataset) / examples_per_user)
-
-    KL_of_each_client, avg_KL = get_KL_value(sorted_train_dataset, num_of_CIFAR10_label, num_of_client)
-
-    Save_KL_Result("FL_non_IID_ILP_cifar10(CNN)", KL_of_each_client, avg_KL)
+    saveKL(train_dataset=sorted_train_dataset,
+           label=num_of_CIFAR10_label,
+           num_of_client=int(len(train_dataset) / examples_per_user),
+           fileName="FL_non_IID_ILP_cifar10(CNN)"
+           )
 
     sharder = SequentialSharder(examples_per_shard=examples_per_user)
     fl_data_loader = DataLoader(
@@ -109,12 +109,6 @@ def main(trainer_config,data_config,use_cuda_if_available: bool = True,) -> None
 
     trainer = instantiate(trainer_config, model=global_model, cuda_enabled=cuda_enabled)
 
-    # print(global_model)
-    # print(model)
-    # print(device)
-    # print(data_provider)
-    # print(metrics_reporter)
-    # print(data_provider.num_train_users())
     final_model, eval_score = trainer.train(
         data_provider=data_provider,
         metrics_reporter=metrics_reporter,

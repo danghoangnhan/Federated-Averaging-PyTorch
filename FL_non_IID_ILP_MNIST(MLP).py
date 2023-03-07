@@ -1,38 +1,33 @@
 import json
+
 import flsim.configs  # noqa
 import hydra
-import numpy as np
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
 from flsim.data.data_sharder import SequentialSharder
-from flsim.data.data_sharder import RandomSharder
 from flsim.interfaces.metrics_reporter import Channel
-from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.config_utils import fl_config_from_json
+from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.example_utils import (
     DataLoader,
     DataProvider,
     FLModel,
     MetricsReporter,
-    SimpleConvNet,
 )
 from hydra.utils import instantiate
-from omegaconf import MISSING, DictConfig, OmegaConf
+from omegaconf import DictConfig, OmegaConf
 from torchvision import datasets, transforms
-from torch import Tensor
-from script.ResultToCSV import CreateHeader, CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
-from script.getKL import get_KL_value
-from src.sampling import mnist_noniid
-from src.model.MLP import MNIST_MLP
+
 from configs.ILP_Heuristic_method_parameter import (
     num_of_original_client,
     num_of_head_client,
-    data_size_of_original_MNIST_client,
     num_of_MNIST_label,
     Max_value_of_ILP,
 )
+from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
+from script.getKL import get_KL_value, saveKL
 from src.algorithm.ILP import ILP_method
+from src.model.MLP import MNIST_MLP
+from src.sampling import mnist_noniid
 
 IMAGE_SIZE = 28
 total_execution_time = 0
@@ -71,11 +66,12 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
             for j in range(len(dict_users[client_index])):
                 data_index = int(dict_users[client_index][j])
                 sorted_train_dataset.append(train_dataset[data_index])
-    num_of_client = int(len(train_dataset) / examples_per_user)
 
-    KL_of_each_client, avg_KL = get_KL_value(sorted_train_dataset, num_of_MNIST_label, num_of_client)
-
-    Save_KL_Result("FL_non_IID_ILP_MNIST(MLP)", KL_of_each_client, avg_KL)
+    saveKL(train_dataset=sorted_train_dataset,
+           label=num_of_MNIST_label,
+           num_of_client=int(len(train_dataset) / examples_per_user),
+           fileName="FL_non_IID_ILP_MNIST(MLP)"
+           )
     # get the amount of each class
     num_of_class_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 

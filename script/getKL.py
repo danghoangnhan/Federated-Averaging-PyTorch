@@ -1,17 +1,5 @@
-import os
-import torch
-import numpy as np
-import cvxpy as cp
-import torchvision
-from torch import nn
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
-import torch
-from torch import Tensor
-from torch import arange
-import matplotlib.pyplot as plt
 import math
-import time
+import csv
 
 
 def KL_function(num_of_label, dataset_size, P_i, Q):
@@ -26,7 +14,10 @@ def KL_function(num_of_label, dataset_size, P_i, Q):
     return KL
 
 
-def get_KL_value(train_dataset, num_of_label, client_num):
+def get_KL_value(train_dataset,
+                 num_of_label,
+                 client_num
+                 ):
     num_of_client = client_num
 
     nums_of_labels_of_each_client = []
@@ -48,7 +39,6 @@ def get_KL_value(train_dataset, num_of_label, client_num):
 
     index = []
     for i in range(len(train_dataset)):
-
         index.append(i)
 
         if i > 0 and (i + 1) % (len(train_dataset) / num_of_client) == 0:
@@ -76,3 +66,36 @@ def get_KL_value(train_dataset, num_of_label, client_num):
     # print(KL_of_each_client)
     print("AVG KL :", avg_KL)
     return KL_of_each_client, avg_KL
+
+
+def Save_KL_Result(filename, KL_list, avg_KL):
+    filepath = "./result/KLresult/" + filename + ".csv"
+
+    header = ["Client_ID", "KL value", "", "Average KL"]
+    data = []
+    f = open(filepath, 'w+', encoding='UTF8', newline='')
+
+    writer = csv.writer(f)
+
+    writer.writerow(header)
+
+    for i in range(len(KL_list)):
+        data = [i, KL_list[i], ""]
+        if i == 0:
+            data.append(avg_KL)
+
+        writer.writerow(data)
+    f.close()
+
+
+def saveKL(
+        train_dataset,
+        label,
+        num_of_client,
+        fileName: str = "FL_non_IID_Heuristic_cifar10(CNN)"):
+    KL_of_each_client, avg_KL = get_KL_value(
+        train_dataset,
+        label,
+        num_of_client
+    )
+    Save_KL_Result(fileName, KL_of_each_client, avg_KL)

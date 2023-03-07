@@ -1,30 +1,21 @@
-import os
-import torch
-import time
-import numpy as np
-import cvxpy as cp
-import torchvision 
-from torch import nn
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
-import torch
-from torch import Tensor
-from torch import arange
-import matplotlib.pyplot as plt
+import itertools
 import math
+import time
+
+import cvxpy as cp
+import numpy as np
+import torch
+from src.sampling import mnist_noniid
+from torchvision import datasets, transforms
+
 from configs.little_case_ILP_Heuristic_method_parameter import (
     num_of_original_client,
     num_of_used_client,
     num_of_head_client,
-    data_size_of_original_MNIST_client,
-    data_size_of_original_CIFAR10_client,
     num_of_MNIST_label,
-    num_of_CIFAR10_label,
-    Max_value_of_ILP,                     
+    Max_value_of_ILP,
 )
 from script.getKL import get_KL_value
-from script.little_case_non_iid import mnist_noniid
-import itertools
 
 IMAGE_SIZE=28
 heuristic_total_execution_time = 0

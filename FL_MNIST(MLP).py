@@ -3,8 +3,6 @@ import json
 import flsim.configs  # noqa
 import hydra
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
 from flsim.data.data_sharder import SequentialSharder
 from flsim.interfaces.metrics_reporter import Channel
 from flsim.utils.config_utils import fl_config_from_json
@@ -18,6 +16,7 @@ from flsim.utils.example_utils import (
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torchvision import datasets, transforms
+
 from src.model.MLP import MNIST_MLP
 
 IMAGE_SIZE = 28
@@ -74,12 +73,6 @@ def main(
 
     trainer = instantiate(trainer_config, model=global_model, cuda_enabled=cuda_enabled)
 
-    # print(global_model)
-    # print(model)
-    # print(device)
-    # print(data_provider)
-    # print(metrics_reporter)
-    # print(data_provider.num_train_users())
     final_model, eval_score = trainer.train(
         data_provider=data_provider,
         metrics_reporter=metrics_reporter,

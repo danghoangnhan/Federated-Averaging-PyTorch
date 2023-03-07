@@ -17,15 +17,15 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torchvision import datasets, transforms
 
-from src.algorithm.Heuristic import heuristic_method
 from configs.ILP_Heuristic_method_parameter import (
     num_of_original_client,
     num_of_head_client,
     num_of_MNIST_label,
 )
+from script.ResultToCSV import CreateResultData, Save_Accuracy_of_each_epoch
+from script.getKL import get_KL_value, saveKL
+from src.algorithm.Heuristic import heuristic_method
 from src.model.CNN import MNIST_CNN
-from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
-from script.getKL import get_KL_value
 from src.sampling import mnist_noniid
 
 IMAGE_SIZE = 28
@@ -35,7 +35,7 @@ total_execution_time = 0
 def build_data_provider(local_batch_size,
                         examples_per_user,
                         drop_last: bool = False,
-                        dataDir:str ="./data/Experiment/data/MNIST"):
+                        dataDir: str = "./data/Experiment/data/MNIST"):
     transform = transforms.Compose(
         [
             transforms.Resize(IMAGE_SIZE),
@@ -58,16 +58,13 @@ def build_data_provider(local_batch_size,
     )
     client_num = num_of_original_client
 
-    KL_of_each_client, avg_KL = get_KL_value(
-        train_dataset,
-        num_of_MNIST_label,
-        100
+    saveKL(train_dataset=train_dataset,
+           label=num_of_MNIST_label,
+           num_of_client=100,
+           fileName="FL_non_IID_Heuristic_MNIST(CNN)"
     )
-    Save_KL_Result(
-        "FL_non_IID_Heuristic_MNIST(CNN)_original",
-        KL_of_each_client,
-        avg_KL
-    )
+
+
 
     dict_users = mnist_noniid(train_dataset, client_num)
 
@@ -90,11 +87,11 @@ def build_data_provider(local_batch_size,
                 data_index = int(dict_users[client_index][j])
                 sorted_train_dataset.append(train_dataset[data_index])
 
-    num_of_client = int(len(train_dataset) / examples_per_user)
-
-    KL_of_each_client, avg_KL = get_KL_value(train_dataset, num_of_MNIST_label, num_of_client)
-
-    Save_KL_Result("FL_non_IID_Heuristic_MNIST(CNN)", KL_of_each_client, avg_KL)
+    saveKL(train_dataset=train_dataset,
+           label=num_of_MNIST_label,
+           num_of_client=int(len(train_dataset) / examples_per_user),
+           fileName="FL_non_IID_Heuristic_MNIST(CNN)"
+           )
 
     sharder = SequentialSharder(examples_per_shard=examples_per_user)
 
@@ -109,6 +106,7 @@ def build_data_provider(local_batch_size,
     data_provider = DataProvider(fl_data_loader)
     print(f"Clients in total: {data_provider.num_train_users()}")
     return data_provider
+
 
 def main(
         trainer_config,
@@ -149,10 +147,12 @@ def main(
     accuracy_of_each_epoch = metrics_reporter.AccuracyList
     best_accuracy_of_each_epoch = max(accuracy_of_each_epoch)
 
-    Save_Accuracy_of_each_epoch(1, "FL_non_IID_Heuristic_MNIST(CNN)", accuracy_of_each_epoch,best_accuracy_of_each_epoch)
+    Save_Accuracy_of_each_epoch(1, "FL_non_IID_Heuristic_MNIST(CNN)", accuracy_of_each_epoch,
+                                best_accuracy_of_each_epoch)
     global total_execution_time
     client_num = num_of_original_client
-    CreateResultData("FL_non_IID_Heuristic_MNIST(CNN)", "MNIST", "CNN", "non-IID -> IID", client_num,int(trainer_config.epochs), eval_score['Accuracy'], total_execution_time)
+    CreateResultData("FL_non_IID_Heuristic_MNIST(CNN)", "MNIST", "CNN", "non-IID -> IID", client_num,
+                     int(trainer_config.epochs), eval_score['Accuracy'], total_execution_time)
 
 
 @hydra.main(config_path="../newcode/configs", config_name="MNIST_config", version_base="1.2")

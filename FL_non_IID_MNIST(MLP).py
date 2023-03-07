@@ -1,4 +1,5 @@
 import json
+
 import flsim.configs  # noqa
 import hydra
 import torch
@@ -15,10 +16,10 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torchvision import datasets, transforms
 
-from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
-from script.getKL import get_KL_value
-from src.sampling import mnist_noniid
+from script.ResultToCSV import CreateResultData, Save_Accuracy_of_each_epoch
+from script.getKL import saveKL
 from src.model.MLP import MNIST_MLP
+from src.sampling import mnist_noniid
 
 IMAGE_SIZE = 28
 
@@ -48,9 +49,11 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
             index = int(dict_users[k][i])
             sorted_train_dataset.append(train_dataset[index])
 
-    KL_of_each_client, avg_KL = get_KL_value(sorted_train_dataset, 10, client_num)
-
-    Save_KL_Result("FL_non_IID_MNIST(MLP)", KL_of_each_client, avg_KL)
+    saveKL(train_dataset=sorted_train_dataset,
+           label=10,
+           num_of_client=client_num,
+           fileName="FL_non_IID_MNIST(MLP)"
+           )
     # get the amount of each class
     num_of_class_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -61,7 +64,12 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
 
     sharder = SequentialSharder(examples_per_shard=examples_per_user)
     fl_data_loader = DataLoader(
-        sorted_train_dataset, test_dataset, test_dataset, sharder, local_batch_size, drop_last
+        sorted_train_dataset,
+        test_dataset,
+        test_dataset,
+        sharder,
+        local_batch_size,
+        drop_last
     )
     data_provider = DataProvider(fl_data_loader)
     print(f"Clients in total: {data_provider.num_train_users()}")
