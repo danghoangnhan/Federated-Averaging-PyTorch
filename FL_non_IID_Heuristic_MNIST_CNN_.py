@@ -17,7 +17,7 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torchvision import datasets, transforms
 
-from algorithm.Heuristic_Algorithm import heuristic_method
+from algorithm.Heuristic import heuristic_method
 from configs.ILP_Heuristic_method_parameter import (
     num_of_original_client,
     num_of_head_client,
@@ -42,23 +42,40 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
         ]
     )
     train_dataset = datasets.MNIST(
-        root="./data/Experiment/data/MNIST", train=True, download=True, transform=transform
+        root="./data/Experiment/data/MNIST",
+        train=True,
+        download=True,
+        transform=transform
     )
     test_dataset = datasets.MNIST(
-        root="./data/Experiment/data/MNIST", train=False, download=True, transform=transform
+        root="./data/Experiment/data/MNIST",
+        train=False,
+        download=True,
+        transform=transform
     )
     client_num = num_of_original_client
 
+    KL_of_each_client, avg_KL = get_KL_value(train_dataset,
+                                             num_of_MNIST_label,
+                                             100)
+
+    Save_KL_Result("FL_non_IID_Heuristic_MNIST(CNN)_original",
+                   KL_of_each_client,
+                   avg_KL)
+
     dict_users = mnist_noniid(train_dataset, client_num)
 
-    index_of_head_group, time = heuristic_method(train_dataset, num_of_MNIST_label, dict_users, client_num,
+    index_of_head_group, time = heuristic_method(train_dataset,
+                                                 num_of_MNIST_label,
+                                                 dict_users,
+                                                 client_num,
                                                  num_of_head_client)
+
     global total_execution_time
     total_execution_time = total_execution_time + time
 
     sorted_train_dataset = []
     for k in range(num_of_head_client):
-
         for i in range(len(index_of_head_group[k])):
             client_index = index_of_head_group[k][i]
             for j in range(len(dict_users[client_index])):
@@ -70,22 +87,20 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
     KL_of_each_client, avg_KL = get_KL_value(train_dataset, num_of_MNIST_label, num_of_client)
 
     Save_KL_Result("FL_non_IID_Heuristic_MNIST(CNN)", KL_of_each_client, avg_KL)
-    # get the amount of each class
-    num_of_class_list = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
-    for i in range(len(sorted_train_dataset)):
-        index = sorted_train_dataset[i][1]
-        num_of_class_list[index] = num_of_class_list[index] + 1
-    print(num_of_class_list)
 
     sharder = SequentialSharder(examples_per_shard=examples_per_user)
+
     fl_data_loader = DataLoader(
-        sorted_train_dataset, test_dataset, test_dataset, sharder, local_batch_size, drop_last
+        sorted_train_dataset,
+        test_dataset,
+        test_dataset,
+        sharder,
+        local_batch_size,
+        drop_last
     )
     data_provider = DataProvider(fl_data_loader)
     print(f"Clients in total: {data_provider.num_train_users()}")
     return data_provider
-
 
 def main(
         trainer_config,
@@ -126,12 +141,10 @@ def main(
     accuracy_of_each_epoch = metrics_reporter.AccuracyList
     best_accuracy_of_each_epoch = max(accuracy_of_each_epoch)
 
-    Save_Accuracy_of_each_epoch(1, "FL_non_IID_Heuristic_MNIST(CNN)", accuracy_of_each_epoch,
-                                best_accuracy_of_each_epoch)
+    Save_Accuracy_of_each_epoch(1, "FL_non_IID_Heuristic_MNIST(CNN)", accuracy_of_each_epoch,best_accuracy_of_each_epoch)
     global total_execution_time
     client_num = num_of_original_client
-    CreateResultData("FL_non_IID_Heuristic_MNIST(CNN)", "MNIST", "CNN", "non-IID -> IID", client_num,
-                     int(trainer_config.epochs), eval_score['Accuracy'], total_execution_time)
+    CreateResultData("FL_non_IID_Heuristic_MNIST(CNN)", "MNIST", "CNN", "non-IID -> IID", client_num,int(trainer_config.epochs), eval_score['Accuracy'], total_execution_time)
 
 
 @hydra.main(config_path="../newcode/configs", config_name="MNIST_config", version_base="1.2")
