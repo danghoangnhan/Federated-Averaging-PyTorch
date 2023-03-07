@@ -25,28 +25,6 @@ def CreateResultData(Case, Dataset, Model, DataType, Number_of_Client, Number_of
 
     f.close()
 
-
-def Save_KL_Result(filename, KL_list, avg_KL):
-    filepath = "./result/KLresult/" + filename + ".csv"
-
-    header = ["Client_ID", "KL value", "", "Average KL"]
-    data = []
-    f = open(filepath, 'w+', encoding='UTF8', newline='')
-
-    writer = csv.writer(f)
-
-    writer.writerow(header)
-
-    for i in range(len(KL_list)):
-        data = [i, KL_list[i], ""]
-        if i == 0:
-            data.append(avg_KL)
-
-        writer.writerow(data)
-
-    f.close()
-
-
 def Save_Accuracy_of_each_epoch(mode, casename, Accuracy_list, Best_Accuracy):
     filename = ""
 
