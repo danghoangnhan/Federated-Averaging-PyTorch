@@ -1,20 +1,3 @@
-#!/usr/bin/env python3
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# All rights reserved.
-#
-# This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree.
-
-"""In this tutorial, we will train an image classifier with FLSim to simulate a federated learning training environment.
-
-With this tutorial, you will learn the following key components of FLSim:
-1. Data loading
-2. Model construction
-3. Trainer construction
-
-    Typical usage example:
-    python3 cifar10_example.py --config-file configs/cifar10_config.json
-"""
 import json
 import flsim.configs  # noqa
 import hydra
@@ -65,7 +48,12 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
 
     sharder = SequentialSharder(examples_per_shard=examples_per_user)
     fl_data_loader = DataLoader(
-        train_dataset, test_dataset, test_dataset, sharder, local_batch_size, drop_last
+        train_dataset,
+        test_dataset,
+        test_dataset,
+        sharder,
+        local_batch_size,
+        drop_last
     )
     data_provider = DataProvider(fl_data_loader)
     print(f"Clients in total: {data_provider.num_train_users()}")
@@ -100,12 +88,6 @@ def main(
 
     trainer = instantiate(trainer_config, model=global_model, cuda_enabled=cuda_enabled)
 
-    # print(global_model)
-    # print(model)
-    # print(device)
-    # print(data_provider)
-    # print(metrics_reporter)
-    # print(data_provider.num_train_users())
     final_model, eval_score = trainer.train(
         data_provider=data_provider,
         metrics_reporter=metrics_reporter,
@@ -119,13 +101,13 @@ def main(
     )
     accuracy_of_each_epoch = metrics_reporter.AccuracyList
     best_accuracy_of_each_epoch = max(accuracy_of_each_epoch)
+
     # print("Accuracy list:",accuracy_of_each_epoch)
     # print("Best Accuracy:",best_accuracy_of_each_epoch)
 
     Save_Accuracy_of_each_epoch(1, "FL_IID_cifar10(CNN)", accuracy_of_each_epoch, best_accuracy_of_each_epoch)
     client_num = data_provider.num_train_users()
-    CreateResultData("FL_IID_cifar10(CNN)", "CIFAR10", "CNN", "IID", client_num, int(trainer_config.epochs),
-                     eval_score['Accuracy'], "")
+    CreateResultData("FL_IID_cifar10(CNN)", "CIFAR10", "CNN", "IID", client_num, int(trainer_config.epochs),eval_score['Accuracy'], "")
 
 
 @hydra.main(config_path="configs", config_name="cifar10_config", version_base="1.2")

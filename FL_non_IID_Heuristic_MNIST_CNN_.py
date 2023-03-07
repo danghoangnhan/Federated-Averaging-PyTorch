@@ -17,7 +17,7 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torchvision import datasets, transforms
 
-from algorithm.Heuristic import heuristic_method
+from src.algorithm.Heuristic import heuristic_method
 from configs.ILP_Heuristic_method_parameter import (
     num_of_original_client,
     num_of_head_client,
@@ -26,13 +26,16 @@ from configs.ILP_Heuristic_method_parameter import (
 from src.model.CNN import MNIST_CNN
 from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
 from script.getKL import get_KL_value
-from script.non_iid import mnist_noniid
+from src.sampling import mnist_noniid
 
 IMAGE_SIZE = 28
 total_execution_time = 0
 
 
-def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = False):
+def build_data_provider(local_batch_size,
+                        examples_per_user,
+                        drop_last: bool = False,
+                        dataDir:str ="./data/Experiment/data/MNIST"):
     transform = transforms.Compose(
         [
             transforms.Resize(IMAGE_SIZE),
@@ -42,34 +45,39 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
         ]
     )
     train_dataset = datasets.MNIST(
-        root="./data/Experiment/data/MNIST",
+        root=dataDir,
         train=True,
         download=True,
         transform=transform
     )
     test_dataset = datasets.MNIST(
-        root="./data/Experiment/data/MNIST",
+        root=dataDir,
         train=False,
         download=True,
         transform=transform
     )
     client_num = num_of_original_client
 
-    KL_of_each_client, avg_KL = get_KL_value(train_dataset,
-                                             num_of_MNIST_label,
-                                             100)
-
-    Save_KL_Result("FL_non_IID_Heuristic_MNIST(CNN)_original",
-                   KL_of_each_client,
-                   avg_KL)
+    KL_of_each_client, avg_KL = get_KL_value(
+        train_dataset,
+        num_of_MNIST_label,
+        100
+    )
+    Save_KL_Result(
+        "FL_non_IID_Heuristic_MNIST(CNN)_original",
+        KL_of_each_client,
+        avg_KL
+    )
 
     dict_users = mnist_noniid(train_dataset, client_num)
 
-    index_of_head_group, time = heuristic_method(train_dataset,
-                                                 num_of_MNIST_label,
-                                                 dict_users,
-                                                 client_num,
-                                                 num_of_head_client)
+    index_of_head_group, time = heuristic_method(
+        train_dataset,
+        num_of_MNIST_label,
+        dict_users,
+        client_num,
+        num_of_head_client
+    )
 
     global total_execution_time
     total_execution_time = total_execution_time + time
@@ -166,5 +174,4 @@ if __name__ == "__main__":
     # print(cfg1)
     cfg = maybe_parse_json_config()
     cfg = OmegaConf.create(json_cfg)
-
     run(cfg)

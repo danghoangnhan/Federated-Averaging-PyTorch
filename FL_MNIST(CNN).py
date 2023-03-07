@@ -69,19 +69,10 @@ def main(
         drop_last=False,
     )
 
-    # print(trainer_config)
-    # print(data_config)
-
     metrics_reporter = MetricsReporter([Channel.TENSORBOARD, Channel.STDOUT])
 
     trainer = instantiate(trainer_config, model=global_model, cuda_enabled=cuda_enabled)
 
-    # print(global_model)
-    # print(model)
-    # print(device)
-    # print(data_provider)
-    # print(metrics_reporter)
-    # print(data_provider.num_train_users())
     final_model, eval_score = trainer.train(
         data_provider=data_provider,
         metrics_reporter=metrics_reporter,

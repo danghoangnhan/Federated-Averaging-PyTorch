@@ -8,8 +8,8 @@ from config.ILP_Heuristic_method_parameter import (
     num_of_CIFAR10_label,
     Max_value_of_ILP,           
 )
-from algorithm.Heuristic_Algorithm import heuristic_method
-from algorithm.ILP_Algorithm import ILP_method
+from src.algorithm.Heuristic import heuristic_method
+from src.algorithm.ILP import ILP_method
 
 ILP_Heuristic_
 

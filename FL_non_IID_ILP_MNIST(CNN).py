@@ -16,7 +16,7 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 from torchvision import datasets, transforms
 
-from algorithm.ILP_Algorithm import ILP_method
+from src.algorithm.ILP import ILP_method
 from configs.ILP_Heuristic_method_parameter import (
     num_of_original_client,
     num_of_head_client,
@@ -26,7 +26,7 @@ from configs.ILP_Heuristic_method_parameter import (
 from src.model.CNN import MNIST_CNN
 from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
 from script.getKL import get_KL_value
-from script.non_iid import mnist_noniid
+from src.sampling import mnist_noniid
 
 IMAGE_SIZE = 28
 

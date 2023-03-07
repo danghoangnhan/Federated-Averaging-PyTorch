@@ -23,7 +23,7 @@ from torchvision import datasets, transforms
 from torch import Tensor
 from script.ResultToCSV import CreateHeader, CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
 from script.getKL import get_KL_value
-from script.non_iid import mnist_noniid
+from src.sampling import mnist_noniid
 from src.model.MLP import MNIST_MLP
 from configs.ILP_Heuristic_method_parameter import (
     num_of_original_client,
@@ -32,7 +32,7 @@ from configs.ILP_Heuristic_method_parameter import (
     num_of_MNIST_label,
     Max_value_of_ILP,
 )
-from algorithm.ILP_Algorithm import ILP_method
+from src.algorithm.ILP import ILP_method
 
 IMAGE_SIZE = 28
 total_execution_time = 0

@@ -17,7 +17,7 @@ from omegaconf import DictConfig, OmegaConf
 from torchvision import transforms
 from torchvision.datasets.cifar import CIFAR10
 
-from algorithm.Heuristic_Algorithm import heuristic_method
+from src.algorithm.Heuristic import heuristic_method
 from configs.ILP_Heuristic_method_parameter import (
     num_of_original_client,
     num_of_head_client,
@@ -69,7 +69,11 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
 
     num_of_client = int(len(train_dataset) / examples_per_user)
 
-    KL_of_each_client, avg_KL = get_KL_value(sorted_train_dataset, num_of_CIFAR10_label, num_of_client)
+    KL_of_each_client, avg_KL = get_KL_value(
+        sorted_train_dataset,
+        num_of_CIFAR10_label,
+        num_of_client
+    )
 
     Save_KL_Result("FL_non_IID_Heuristic_cifar10(CNN)", KL_of_each_client, avg_KL)
 
@@ -109,7 +113,11 @@ def main(
     )
 
     metrics_reporter = MetricsReporter([Channel.TENSORBOARD, Channel.STDOUT])
-    trainer = instantiate(trainer_config, model=global_model, cuda_enabled=cuda_enabled)
+    trainer = instantiate(
+        trainer_config,
+        model=global_model,
+        cuda_enabled=cuda_enabled
+    )
     final_model, eval_score = trainer.train(
         data_provider=data_provider,
         metrics_reporter=metrics_reporter,
@@ -123,8 +131,12 @@ def main(
     )
     accuracy_of_each_epoch = metrics_reporter.ACCURACY
     best_accuracy_of_each_epoch = max(accuracy_of_each_epoch)
-    Save_Accuracy_of_each_epoch(1, "FL_non_IID_Heuristic_cifar10(CNN)", accuracy_of_each_epoch,
-                                best_accuracy_of_each_epoch)
+    Save_Accuracy_of_each_epoch(
+        1,
+        "FL_non_IID_Heuristic_cifar10(CNN)",
+        accuracy_of_each_epoch,
+        best_accuracy_of_each_epoch
+    )
     client_num = num_of_original_client
     global total_execution_time
     CreateResultData("FL_non_IID_Heuristic_cifar10(CNN)", "CIFAR10", "CNN", "non-IID -> IID", client_num,

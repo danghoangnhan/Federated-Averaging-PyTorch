@@ -31,6 +31,7 @@ def load(idx):
     local_weights.append(copy.deepcopy(w))
     local_losses.append(copy.deepcopy(loss))
 
+
 if __name__ == '__main__':
     start_time = time.time()
 
@@ -164,7 +165,6 @@ if __name__ == '__main__':
 
     print('\n Total Run Time: {0:0.4f}'.format(time.time() - start_time))
 
-
     # PLOTTING (optional)
     # import matplotlib
     # import matplotlib.pyplot as plt
@@ -189,4 +189,3 @@ if __name__ == '__main__':
     # plt.savefig('../save/fed_{}_{}_{}_C[{}]_iid[{}]_E[{}]_B[{}]_acc.png'.
     #             format(args.dataset, args.model, args.epochs, args.frac,
     #                    args.iid, args.local_ep, args.local_bs))
-

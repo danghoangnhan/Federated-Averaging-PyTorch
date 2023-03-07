@@ -13,7 +13,6 @@ from torchvision import datasets, transforms
 from src.sampling import mnist_iid, mnist_noniid, mnist_noniid_unequal
 from src.sampling import cifar_iid, cifar_noniid
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -206,6 +205,8 @@ def create_datasets(data_path, dataset_name, num_clients, num_shards, iid):
             for i in range(0, len(shard_inputs_sorted), shards_per_clients)
         ]
     return local_datasets, test_dataset
+
+
 def get_dataset(args):
     """ Returns train and test datasets and a user group which is a dict where
     the keys are the user index and the values are the corresponding data for
@@ -219,10 +220,10 @@ def get_dataset(args):
              transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
         train_dataset = datasets.CIFAR10(data_dir, train=True, download=True,
-                                       transform=apply_transform)
+                                         transform=apply_transform)
 
         test_dataset = datasets.CIFAR10(data_dir, train=False, download=True,
-                                      transform=apply_transform)
+                                        transform=apply_transform)
 
         # sample training data amongst users
         if args.iid:
