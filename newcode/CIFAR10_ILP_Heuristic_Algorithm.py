@@ -17,7 +17,7 @@ from configs.little_case_ILP_Heuristic_method_parameter import (
     Max_value_of_ILP,
 )
 from script.getKL import get_KL_value
-from script.little_case_non_iid import cifar10_noniid
+from src.sampling import  cifar_noniid
 
 IMAGE_SIZE = 28
 heuristic_total_execution_time = 0
@@ -166,7 +166,10 @@ def heuristic_method(train_dataset, num_of_label, client_data_index, original_cl
                     P_i_list[t] = P_i_list[t] + nums_of_labels_of_each_client[head_index_group[i][j]][t]
             for j in range(len(unassigned_member_index)):
                 P_j_list = nums_of_labels_of_each_client[unassigned_member_index[j]]
-                KL = KL_of_combination(label_num, size_of_combination_head + member_size, P_i_list, P_j_list,
+                KL = KL_of_combination(label_num,
+                                       size_of_combination_head + member_size,
+                                       P_i_list,
+                                       P_j_list,
                                        distribution_Q)
                 KL_list.append(KL)
 
@@ -481,12 +484,10 @@ def main():
     test_dataset = CIFAR10(
         root="../Experiment/data/cifar10", train=False, download=True, transform=transform
     )
-    # print(train_dataset)
     client_num = num_of_original_client
-    # print(client_num)
-    # divide train dataset(non-iid)
 
-    dict_users = cifar10_noniid(train_dataset, client_num)
+
+    dict_users = cifar_noniid(train_dataset, client_num)
 
     ##########heuristic method##########
     print("##########heuristic method##########")
@@ -533,9 +534,4 @@ def main():
                 data_index = int(dict_users[client_index][j])
                 sorted_ILP_method_train_dataset.append(train_dataset[data_index])
     ILP_KL_of_each_client, ILP_avg_KL = get_KL_value(sorted_ILP_method_train_dataset, num_of_CIFAR10_label,
-                                                     num_of_client)
-    # print(ILP_avg_KL)
-
-
-if __name__ == "__main__":
-    main()
+num_of_client)

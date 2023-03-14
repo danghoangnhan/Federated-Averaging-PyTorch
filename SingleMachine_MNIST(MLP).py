@@ -8,7 +8,7 @@ import torch.optim as optim
 from torch.optim.lr_scheduler import StepLR
 from torchvision import datasets, transforms
 
-from model.MNIST_MLP import MNIST_MLP
+from src.model.MLP import MNIST_MLP
 from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
 from script.getKL import get_KL_value
 

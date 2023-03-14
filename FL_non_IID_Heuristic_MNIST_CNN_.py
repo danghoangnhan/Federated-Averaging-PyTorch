@@ -25,8 +25,10 @@ from configs.ILP_Heuristic_method_parameter import (
 from script.ResultToCSV import CreateResultData, Save_Accuracy_of_each_epoch
 from script.getKL import saveKL
 from src.algorithm.Heuristic import heuristic_method
+from src.label import label_group
 from src.model.CNN import MNIST_CNN
 from src.sampling import mnist_noniid
+from src.visual import showLabelDistribution
 
 IMAGE_SIZE = 28
 total_execution_time = 0
@@ -78,14 +80,16 @@ def build_data_provider(local_batch_size,
     total_execution_time = total_execution_time + time
 
     sorted_train_dataset = []
-    for k in range(num_of_head_client):
-        for i in range(len(index_of_head_group[k])):
-            client_index = index_of_head_group[k][i]
-            for j in range(len(dict_users[client_index])):
-                data_index = int(dict_users[client_index][j])
-                sorted_train_dataset.append(train_dataset[data_index])
-
-    saveKL(train_dataset=train_dataset,
+    for group in index_of_head_group:
+        for client_index in group:
+            for data_index in dict_users[client_index]:
+                sorted_train_dataset.append(train_dataset[int(data_index)])
+    label_per_group, labelcount =label_group(
+        sorted_train_dataset = sorted_train_dataset,
+        groupSize=int(len(train_dataset) / examples_per_user)
+    )
+    showLabelDistribution(labelcount)
+    saveKL(train_dataset=sorted_train_dataset,
            label=num_of_MNIST_label,
            num_of_client=int(len(train_dataset) / examples_per_user),
            fileName="FL_non_IID_Heuristic_MNIST(CNN)"
@@ -120,7 +124,7 @@ def main(
 
     if cuda_enabled:
         global_model.fl_cuda()
-    # print(f"Created {trainer_config._target_}")
+
     data_provider = build_data_provider(
         local_batch_size=data_config.local_batch_size,
         examples_per_user=data_config.examples_per_user,
@@ -145,7 +149,9 @@ def main(
     accuracy_of_each_epoch = metrics_reporter.AccuracyList
     best_accuracy_of_each_epoch = max(accuracy_of_each_epoch)
 
-    Save_Accuracy_of_each_epoch(1, "FL_non_IID_Heuristic_MNIST(CNN)", accuracy_of_each_epoch,
+    Save_Accuracy_of_each_epoch(1,
+                                "FL_non_IID_Heuristic_MNIST(CNN)",
+                                accuracy_of_each_epoch,
                                 best_accuracy_of_each_epoch)
     global total_execution_time
     client_num = num_of_original_client
@@ -156,7 +162,6 @@ def main(
 @hydra.main(config_path="../newcode/configs", config_name="MNIST_config", version_base="1.2")
 def run(cfg: DictConfig) -> None:
     print('-------------------FL_non_IID_Heuristic_MNIST(CNN)-------------------')
-    # print(cfg)
     trainer_config = cfg.trainer
     data_config = cfg.data
     main(
@@ -166,9 +171,5 @@ def run(cfg: DictConfig) -> None:
 
 
 if __name__ == "__main__":
-    f = open('configs/ILP_Heuristic_MNIST_config.json')
-    data = json.load(f)
-    json_cfg = fl_config_from_json(data)
-    cfg = maybe_parse_json_config()
-    cfg = OmegaConf.create(json_cfg)
+    cfg = OmegaConf.create(fl_config_from_json(json.load(open('configs/ILP_Heuristic_MNIST_config.json'))))
     run(cfg)

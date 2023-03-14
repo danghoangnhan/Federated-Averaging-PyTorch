@@ -6,7 +6,7 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 
-from model.CIFAR10_CNN import CIFAR10_CNN
+from src.model.CNN import CIFAR10_CNN
 from script.ResultToCSV import CreateResultData, Save_KL_Result, Save_Accuracy_of_each_epoch
 from script.getKL import get_KL_value
 

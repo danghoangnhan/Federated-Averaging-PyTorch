@@ -73,15 +73,12 @@ def main(
 
     if cuda_enabled:
         global_model.fl_cuda()
-    # print(f"Created {trainer_config._target_}")
+
     data_provider = build_data_provider(
         local_batch_size=data_config.local_batch_size,
         examples_per_user=data_config.examples_per_user,
         drop_last=False,
     )
-
-    # print(trainer_config)
-    # print(data_config)
 
     metrics_reporter = MetricsReporter([Channel.TENSORBOARD, Channel.STDOUT])
 
@@ -100,9 +97,6 @@ def main(
     )
     accuracy_of_each_epoch = metrics_reporter.AccuracyList
     best_accuracy_of_each_epoch = max(accuracy_of_each_epoch)
-
-    # print("Accuracy list:",accuracy_of_each_epoch)
-    # print("Best Accuracy:",best_accuracy_of_each_epoch)
 
     Save_Accuracy_of_each_epoch(1, "FL_IID_cifar10(CNN)", accuracy_of_each_epoch, best_accuracy_of_each_epoch)
     client_num = data_provider.num_train_users()

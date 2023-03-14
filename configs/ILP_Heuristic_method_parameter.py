@@ -1,7 +1,7 @@
 
 num_of_original_client = 100
 
-num_of_head_client = 50
+num_of_head_client = 20
 
 data_size_of_original_MNIST_client = 600
 

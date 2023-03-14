@@ -14,6 +14,21 @@ def KL_function(num_of_label, dataset_size, P_i, Q):
     return KL
 
 
+def KL_of_combination(num_of_label,
+                      total_dataset_size,
+                      P_i,
+                      P_j,
+                      Q
+                      ):
+    KL = 0
+    for i in range(num_of_label):
+        P = (P_i[i] + P_j[i]) / total_dataset_size
+        if P != 0:
+            result_of_division = P / Q
+            KL = KL + (P * math.log(result_of_division, 2))
+    return KL
+
+
 def get_KL_value(train_dataset,
                  num_of_label,
                  client_num

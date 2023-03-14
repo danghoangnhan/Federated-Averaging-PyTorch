@@ -1,6 +1,7 @@
 import math
 import time
-from script.getKL import get_KL_value
+from script.getKL import get_KL_value, KL_of_combination
+
 
 def heuristic_method(train_dataset,
                      num_of_label,
@@ -120,7 +121,7 @@ def heuristic_method(train_dataset,
                     P_i_list[t] = P_i_list[t] + nums_of_labels_of_each_client[head_index_group[i][j]][t]
             for j in range(len(unassigned_member_index)):
                 P_j_list = nums_of_labels_of_each_client[unassigned_member_index[j]]
-                KL = get_KL_value(label_num,
+                KL = KL_of_combination(label_num,
                                        size_of_combination_head + member_size,
                                        P_i_list,
                                        P_j_list,
