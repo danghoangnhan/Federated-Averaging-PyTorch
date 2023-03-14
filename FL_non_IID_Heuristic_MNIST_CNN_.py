@@ -23,7 +23,7 @@ from configs.ILP_Heuristic_method_parameter import (
     num_of_MNIST_label,
 )
 from script.ResultToCSV import CreateResultData, Save_Accuracy_of_each_epoch
-from script.getKL import get_KL_value, saveKL
+from script.getKL import saveKL
 from src.algorithm.Heuristic import heuristic_method
 from src.model.CNN import MNIST_CNN
 from src.sampling import mnist_noniid
@@ -62,9 +62,7 @@ def build_data_provider(local_batch_size,
            label=num_of_MNIST_label,
            num_of_client=100,
            fileName="FL_non_IID_Heuristic_MNIST(CNN)"
-    )
-
-
+           )
 
     dict_users = mnist_noniid(train_dataset, client_num)
 

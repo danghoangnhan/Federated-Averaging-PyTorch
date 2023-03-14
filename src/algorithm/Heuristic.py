@@ -131,10 +131,6 @@ def heuristic_method(train_dataset,
             # find the member with the lowest KL
             min_KL = min(KL_list)
             index_of_member_with_min_KL = KL_list.index(min_KL)
-            # if k == 3 and (i<3):
-            # print(KL_list)
-            # print(min_KL)
-            # print(index_of_member_with_min_KL)
             # assign the member to the head group
             head_index_group[i].append(unassigned_member_index[index_of_member_with_min_KL])
             unassigned_member_index.remove(unassigned_member_index[index_of_member_with_min_KL])
