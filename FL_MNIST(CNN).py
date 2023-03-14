@@ -1,24 +1,22 @@
 import json
+
 import flsim.configs  # noqa
 import hydra
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
 from flsim.data.data_sharder import SequentialSharder
 from flsim.interfaces.metrics_reporter import Channel
-from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.config_utils import fl_config_from_json
+from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.example_utils import (
     DataLoader,
     DataProvider,
     FLModel,
     MetricsReporter,
-    SimpleConvNet,
 )
 from hydra.utils import instantiate
-from omegaconf import MISSING, DictConfig, OmegaConf
+from omegaconf import DictConfig, OmegaConf
 from torchvision import datasets, transforms
-from torch import Tensor
+
 from src.model.CNN import MNIST_CNN
 
 IMAGE_SIZE = 28
@@ -98,11 +96,9 @@ def run(cfg: DictConfig) -> None:
 
 
 if __name__ == "__main__":
-    f = open('C:\Python\Program\Experiment\configs\MNIST_config.json')
+    f = open('./configs/MNIST_config.json')
     data = json.load(f)
     json_cfg = fl_config_from_json(data)
-    # print(cfg1)
     cfg = maybe_parse_json_config()
     cfg = OmegaConf.create(json_cfg)
-
     run(cfg)

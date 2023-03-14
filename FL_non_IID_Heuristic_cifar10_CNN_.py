@@ -159,7 +159,5 @@ def run(cfg: DictConfig) -> None:
 
 
 if __name__ == "__main__":
-    f = open('configs/ILP_Heuristic_cifar10_config.json')
-    data = json.load(f)
-    cfg = OmegaConf.create(fl_config_from_json(data))
+    cfg = OmegaConf.create(fl_config_from_json(json.load(open('configs/ILP_Heuristic_cifar10_config.json'))))
     run(cfg)

@@ -123,11 +123,6 @@ def run(cfg: DictConfig) -> None:
 
 
 if __name__ == "__main__":
-    f = open('configs/MNIST_config.json')
-    data = json.load(f)
-    json_cfg = fl_config_from_json(data)
-    # print(cfg1)
-    cfg = maybe_parse_json_config()
+    json_cfg = fl_config_from_json(json.load(open('configs/MNIST_config.json')))
     cfg = OmegaConf.create(json_cfg)
-
     run(cfg)

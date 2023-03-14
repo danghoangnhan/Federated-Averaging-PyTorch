@@ -85,7 +85,7 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
     return data_provider
 
 
-def main(trainer_config,data_config,use_cuda_if_available: bool = True,) -> None:
+def main(trainer_config, data_config, use_cuda_if_available: bool = True, ) -> None:
     cuda_enabled = torch.cuda.is_available() and use_cuda_if_available
     device = torch.device(f"cuda:{0}" if cuda_enabled else "cpu")
     model = CIFAR10_CNN()
@@ -128,7 +128,8 @@ def main(trainer_config,data_config,use_cuda_if_available: bool = True,) -> None
     Save_Accuracy_of_each_epoch(1, "FL_non_IID_ILP_cifar10(CNN)", accuracy_of_each_epoch, best_accuracy_of_each_epoch)
     global total_execution_time
     client_num = num_of_original_client
-    CreateResultData("FL_non_IID_ILP_cifar10(CNN)", "CIFAR10", "CNN", "non-IID -> IID", client_num,int(trainer_config.epochs), eval_score['Accuracy'], total_execution_time)
+    CreateResultData("FL_non_IID_ILP_cifar10(CNN)", "CIFAR10", "CNN", "non-IID -> IID", client_num,
+                     int(trainer_config.epochs), eval_score['Accuracy'], total_execution_time)
 
 
 @hydra.main(config_path="configs", config_name="cifar10_config", version_base="1.2")
@@ -142,12 +143,7 @@ def run(cfg: DictConfig) -> None:
         data_config
     )
 
-if __name__ == "__main__":
-    f = open('configs/ILP_Heuristic_cifar10_config.json')
-    data = json.load(f)
-    json_cfg = fl_config_from_json(data)
-    # print(cfg1)
-    cfg = maybe_parse_json_config()
-    cfg = OmegaConf.create(json_cfg)
 
+if __name__ == "__main__":
+    cfg = OmegaConf.create(fl_config_from_json(json.load(open('configs/ILP_Heuristic_cifar10_config.json'))))
     run(cfg)
