@@ -68,6 +68,14 @@ def build_data_provider(local_batch_size,
 
     dict_users = mnist_noniid(train_dataset, client_num)
 
+    origin = [train_dataset[i] for i in range(len(train_dataset))]
+    label_per_group, labelcount = label_group(
+        sorted_train_dataset=origin,
+        groupSize=100
+    )
+    showLabelDistribution(labelcount,
+                          fileName="before_heuristic")
+
     index_of_head_group, time = heuristic_method(
         train_dataset,
         num_of_MNIST_label,
@@ -84,11 +92,12 @@ def build_data_provider(local_batch_size,
         for client_index in group:
             for data_index in dict_users[client_index]:
                 sorted_train_dataset.append(train_dataset[int(data_index)])
-    label_per_group, labelcount =label_group(
-        sorted_train_dataset = sorted_train_dataset,
+
+    label_per_group, labelcount = label_group(
+        sorted_train_dataset=sorted_train_dataset,
         groupSize=int(len(train_dataset) / examples_per_user)
     )
-    showLabelDistribution(labelcount)
+    showLabelDistribution(labelcount, "after_heuristic")
     saveKL(train_dataset=sorted_train_dataset,
            label=num_of_MNIST_label,
            num_of_client=int(len(train_dataset) / examples_per_user),
