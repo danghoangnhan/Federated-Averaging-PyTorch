@@ -6,7 +6,6 @@ import torch
 from flsim.data.data_sharder import SequentialSharder
 from flsim.interfaces.metrics_reporter import Channel
 from flsim.utils.config_utils import fl_config_from_json
-from flsim.utils.config_utils import maybe_parse_json_config
 from flsim.utils.example_utils import (
     DataLoader,
     DataProvider,
@@ -27,7 +26,7 @@ from script.getKL import saveKL
 from src.algorithm.Heuristic import heuristic_method
 from src.label import label_group
 from src.model.CNN import MNIST_CNN
-from src.sampling import mnist_noniid
+from src.sampling import mnist_noniid, mnist_heuristic
 from src.visual import showLabelDistribution
 
 IMAGE_SIZE = 28
@@ -67,7 +66,8 @@ def build_data_provider(local_batch_size,
            )
 
     dict_users = mnist_noniid(train_dataset, client_num)
-
+    test = mnist_heuristic(train_dataset, client_numnum_of_head_client)
+    print(test)
     origin = [train_dataset[i] for i in range(len(train_dataset))]
     label_per_group, labelcount = label_group(
         sorted_train_dataset=origin,
