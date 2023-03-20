@@ -1,16 +1,6 @@
 import os
-import torch
-import numpy as np
-import torchvision 
-from torch import nn
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
-import torch
-from torch import Tensor
-from torch import arange
-import matplotlib.pyplot as plt
-from script.ResultToCSV import CreateHeader
 
+from script.ResultToCSV import CreateHeader
 
 CreateHeader()
 os.system('python SingleMachine_MNIST(MLP).py')

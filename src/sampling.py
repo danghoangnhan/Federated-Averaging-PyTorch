@@ -64,8 +64,12 @@ def mnist_heuristic(dataset, num_users, headClient):
         original_client_num=num_users,
         head_num=headClient
     )
-    for group in index_of_head_group:
-        print(group)
+    result = {i: np.array([]) for i in range(headClient)}
+
+    for groupIndex in range(len(index_of_head_group)):
+        for clientIndex in index_of_head_group[groupIndex]:
+                result[groupIndex] = np.append(result[groupIndex], dict_users[clientIndex])
+    return result
 
 
 def mnist_noniid_unequal(dataset, num_users):

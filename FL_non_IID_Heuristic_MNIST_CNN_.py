@@ -1,4 +1,5 @@
 import json
+import os
 
 import flsim.configs  # noqa
 import hydra
@@ -66,7 +67,10 @@ def build_data_provider(local_batch_size,
            )
 
     dict_users = mnist_noniid(train_dataset, client_num)
-    test = mnist_heuristic(train_dataset, client_numnum_of_head_client)
+    client_numnum_of_head_client = 20
+    test = mnist_heuristic(dataset=train_dataset,
+                           num_users=100,
+                           headClient=client_numnum_of_head_client)
     print(test)
     origin = [train_dataset[i] for i in range(len(train_dataset))]
     label_per_group, labelcount = label_group(
@@ -180,5 +184,6 @@ def run(cfg: DictConfig) -> None:
 
 
 if __name__ == "__main__":
-    cfg = OmegaConf.create(fl_config_from_json(json.load(open('configs/ILP_Heuristic_MNIST_config.json'))))
+    ROOT_DIR = os.path.dirname(os.path.abspath(__file__))  # This is your Project Root
+    cfg = OmegaConf.create(fl_config_from_json(json.load(open(ROOT_DIR+'/configs/ILP_Heuristic_MNIST_config.json'))))
     run(cfg)

@@ -3,3 +3,4 @@ log
 data
 script/__pycache__/
 model/__pycache__/
+venv

@@ -1,26 +1,17 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# Python version: 3.6
-
-
-import os
 import copy
-import time
+import os
 import pickle
-from multiprocessing import pool
+import threading
+import time
 
 import numpy as np
-import threading
-
+import torch
+from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-import torch
-
-from torch.utils.tensorboard import SummaryWriter
-
+from src.models import MLP, CNNMnist, CNNFashion_Mnist, CNNCifar
 from src.options import args_parser
 from src.update import LocalUpdate, test_inference
-from src.models import MLP, CNNMnist, CNNFashion_Mnist, CNNCifar
 from src.utils import get_dataset, average_weights, exp_details
 from src.utils import launch_tensor_board
 
@@ -36,7 +27,7 @@ if __name__ == '__main__':
     start_time = time.time()
 
     # define paths
-    path_project = os.path.abspath('..')
+    path_project = os.path.abspath('')
     logger = SummaryWriter('../logs')
     writer = SummaryWriter(log_dir=os.getcwd() + "/log", filename_suffix="FL")
 
@@ -100,8 +91,6 @@ if __name__ == '__main__':
             w, loss = local_model.update_weights(model=copy.deepcopy(global_model), global_round=epoch)
             local_weights.append(copy.deepcopy(w))
             local_losses.append(copy.deepcopy(loss))
-        # with pool.ThreadPool(processes=os.cpu_count() - 1) as workhorse:
-        #     selected_total_size = workhorse.map(load, idxs_users)
 
         # update global weights
         global_weights = average_weights(local_weights)
@@ -133,7 +122,7 @@ if __name__ == '__main__':
             'Loss',
             {
                 f"[{args.dataset}]_{args.model} C_{args.frac}, E_{args.local_ep},"
-                f" B_{args.batch_size},"
+                f" B_{args.local_bs},"
                 f" IID_{args.iid}": np.mean(np.array(train_loss))},
             epoch + 1
         )
@@ -142,7 +131,7 @@ if __name__ == '__main__':
             {
                 f"[{args.dataset}]_{args.model} C_{args.frac},"
                 f" E_{args.local_ep},"
-                f" B_{args.batch_size},"
+                f" B_{args.local_bs},"
                 f" IID_{args.iid}": '{:.2f}% \n'.format(100 * train_accuracy[-1])},
             epoch + 1
         )
