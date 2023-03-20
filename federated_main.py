@@ -1,38 +1,27 @@
 import copy
 import os
 import pickle
-import threading
 import time
 
 import numpy as np
 import torch
-from torch.utils.tensorboard import SummaryWriter
+from tensorboardX import SummaryWriter
 from tqdm import tqdm
 
 from src.models import MLP, CNNMnist, CNNFashion_Mnist, CNNCifar
 from src.options import args_parser
 from src.update import LocalUpdate, test_inference
 from src.utils import get_dataset, average_weights, exp_details
-from src.utils import launch_tensor_board
-
-
-def load(idx):
-    local_model = LocalUpdate(args=args, dataset=train_dataset, idxs=user_groups[idx], logger=logger)
-    w, loss = local_model.update_weights(model=copy.deepcopy(global_model), global_round=epoch)
-    local_weights.append(copy.deepcopy(w))
-    local_losses.append(copy.deepcopy(loss))
-
 
 if __name__ == '__main__':
     start_time = time.time()
 
     # define paths
     path_project = os.path.abspath('')
-    logger = SummaryWriter('../logs')
-    writer = SummaryWriter(log_dir=os.getcwd() + "/log", filename_suffix="FL")
-
     args = args_parser()
     exp_details(args)
+
+    writer = SummaryWriter(log_dir=os.getcwd() + "/log/" + str(args.iid), filename_suffix="FL")
 
     global device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -56,7 +45,8 @@ if __name__ == '__main__':
         len_in = 1
         for x in img_size:
             len_in *= x
-            global_model = MLP(dim_in=len_in, dim_hidden=64,
+            global_model = MLP(dim_in=len_in,
+                               dim_hidden=64,
                                dim_out=args.num_classes)
     else:
         exit('Error: unrecognized model')
@@ -76,18 +66,16 @@ if __name__ == '__main__':
     print_every = 2
     val_loss_pre, counter = 0, 0
 
-    tb_thread = threading.Thread(target=launch_tensor_board, args=(['./log/', "5252", '0.0.0.0'])).start()
-
     for epoch in tqdm(range(args.epochs)):
         local_weights, local_losses = [], []
         print(f'\n | Global Training Round : {epoch + 1} |\n')
 
         global_model.train()
-        m = max(int(args.frac * args.num_users), 1)
-        idxs_users = np.random.choice(range(args.num_users), m, replace=False)
+        m = int(args.head_client) if args.iid == 2 else max(int(args.frac * args.num_users), 1)
+        idxs_users = np.random.choice(range(args.head_client if args.iid == 2 else args.num_users), m, replace=False)
 
         for idx in idxs_users:
-            local_model = LocalUpdate(args=args, dataset=train_dataset, idxs=user_groups[idx], logger=logger)
+            local_model = LocalUpdate(args=args, dataset=train_dataset, idxs=user_groups[idx], logger=writer)
             w, loss = local_model.update_weights(model=copy.deepcopy(global_model), global_round=epoch)
             local_weights.append(copy.deepcopy(w))
             local_losses.append(copy.deepcopy(loss))
@@ -106,35 +94,21 @@ if __name__ == '__main__':
         global_model.eval()
         for c in range(args.num_users):
             local_model = LocalUpdate(args=args, dataset=train_dataset,
-                                      idxs=user_groups[idx], logger=logger)
+                                      idxs=user_groups[idx], logger=writer)
             acc, loss = local_model.inference(model=global_model)
             list_acc.append(acc)
             list_loss.append(loss)
         train_accuracy.append(sum(list_acc) / len(list_acc))
-
+        runner = f"Accuracy: [{args.dataset}]_{args.model} C_{args.frac},"
+        f" E_{args.local_ep},"
+        f" B_{args.local_bs},"
+        f" IID_{args.iid}"
+        writer.add_scalars('Accuracy', {runner: float(100 * train_accuracy[-1])}, epoch + 1)
         # print global training loss after every 'i' rounds
         if (epoch + 1) % print_every == 0:
             print(f' \nAvg Training Stats after {epoch + 1} global rounds:')
             print(f'Training Loss : {np.mean(np.array(train_loss))}')
             print('Train Accuracy: {:.2f}% \n'.format(100 * train_accuracy[-1]))
-
-        writer.add_scalars(
-            'Loss',
-            {
-                f"[{args.dataset}]_{args.model} C_{args.frac}, E_{args.local_ep},"
-                f" B_{args.local_bs},"
-                f" IID_{args.iid}": np.mean(np.array(train_loss))},
-            epoch + 1
-        )
-        writer.add_scalars(
-            'Accuracy',
-            {
-                f"[{args.dataset}]_{args.model} C_{args.frac},"
-                f" E_{args.local_ep},"
-                f" B_{args.local_bs},"
-                f" IID_{args.iid}": '{:.2f}% \n'.format(100 * train_accuracy[-1])},
-            epoch + 1
-        )
 
     # Test inference after completion of training
     test_acc, test_loss = test_inference(args, global_model, test_dataset)

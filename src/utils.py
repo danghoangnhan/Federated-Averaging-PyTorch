@@ -1,3 +1,4 @@
+import copy
 import logging
 import os
 
@@ -7,11 +8,10 @@ import torch.nn as nn
 import torch.nn.init as init
 import torchvision
 from torch.utils.data import Dataset
-import copy
-import torch
 from torchvision import datasets, transforms
+
+from src.sampling import cifar_iid, cifar_noniid, mnist_heuristic
 from src.sampling import mnist_iid, mnist_noniid, mnist_noniid_unequal
-from src.sampling import cifar_iid, cifar_noniid
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ def launch_tensor_board(log_path, port, host):
         port: Port number used for launching TensorBoard.
         host: Address used for launching TensorBoard.
     """
-    os.system(f"tensorboard --logdir={log_path} --port={port} --host={host}")
+    os.system(f"tensorboard --logdir_spec={log_path} --port={port} --host={host}")
     return True
 
 
@@ -255,10 +255,10 @@ def get_dataset(args):
                                       transform=apply_transform)
 
         # sample training data amongst users
-        if args.iid:
+        if args.iid == 1:
             # Sample IID user data from Mnist
             user_groups = mnist_iid(train_dataset, args.num_users)
-        else:
+        if args.iid == 0:
             # Sample Non-IID user data from Mnist
             if args.unequal:
                 # Chose uneuqal splits for every user
@@ -266,7 +266,8 @@ def get_dataset(args):
             else:
                 # Chose euqal splits for every user
                 user_groups = mnist_noniid(train_dataset, args.num_users)
-
+        if args.iid == 2:
+            user_groups = mnist_heuristic(dataset=train_dataset, num_users=args.num_users, headClient=args.head_client)
     return train_dataset, test_dataset, user_groups
 
 
@@ -290,10 +291,13 @@ def exp_details(args):
     print(f'    Global Rounds   : {args.epochs}\n')
 
     print('    Federated parameters:')
-    if args.iid:
+    if args.iid == 1:
         print('    IID')
-    else:
+    elif args.iid == 0:
         print('    Non-IID')
+    elif args.iid == 2:
+        print(' Heuristic')
+        print(f' Head users:{args.head_client}')
     print(f'    Fraction of users  : {args.frac}')
     print(f'    Local Batch size   : {args.local_bs}')
     print(f'    Local Epochs       : {args.local_ep}\n')

@@ -10,3 +10,4 @@ flsim~=0.1.0
 yaml~=0.2.5
 pandas~=1.5.1
 hydra~=2.5
+tensorboardX~=2.6

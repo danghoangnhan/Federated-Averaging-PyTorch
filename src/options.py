@@ -60,5 +60,10 @@ def args_parser():
                         help='rounds of early stopping')
     parser.add_argument('--verbose', type=int, default=1, help='verbose')
     parser.add_argument('--seed', type=int, default=1, help='random seed')
+
+    # for heuristic and ipl
+    parser.add_argument('--head_client', type=int, default=20, help='number of head client')
+    parser.add_argument('--member_client', type=int, default=80, help='number of member client')
+
     args = parser.parse_args()
     return args
