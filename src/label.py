@@ -11,7 +11,9 @@ def label_group(
     for subset in range(0, totalData, data_per_group):
         subData = sorted_train_dataset[subset:subset + data_per_group]
         labellist = [data[1] for data in subData]
+        #print("labellist:",labellist)
         map = Counter(labellist)
+        #print("map:",map)
         sum = 0
         for _ in map.values():
             sum += 1

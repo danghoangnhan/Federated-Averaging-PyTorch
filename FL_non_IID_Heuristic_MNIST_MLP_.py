@@ -55,7 +55,7 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
                                                  num_of_head_client)
     global total_execution_time
     total_execution_time = total_execution_time + time
-
+###合併client dataset
     # merge train dataset
     sorted_train_dataset = []
     for k in range(num_of_head_client):
@@ -64,7 +64,7 @@ def build_data_provider(local_batch_size, examples_per_user, drop_last: bool = F
             for j in range(len(dict_users[client_index])):
                 data_index = int(dict_users[client_index][j])
                 sorted_train_dataset.append(train_dataset[data_index])
-
+###
     # get the amount of each class
 
     saveKL(train_dataset=sorted_train_dataset,

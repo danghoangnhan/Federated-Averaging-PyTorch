@@ -1,0 +1,9 @@
+baseline_main.py : src檔頭移除
+sampling.py: line 9新增 sys功能做(configs.ILP_Heuristic_method_parameter)路徑指引
+federated_main 標頭去除src
+
+test code:
+
+python src/federated_main_change_6_2.py --model=mlp --dataset=mnist  --iid=0 --epochs=15   
+
+

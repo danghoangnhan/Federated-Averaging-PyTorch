@@ -1,0 +1,14 @@
+baseline_main.py : src檔頭移除
+sampling.py: line 9新增 sys功能做(configs.ILP_Heuristic_method_parameter)路徑指引
+federated_main 標頭去除src
+
+test code:
+python src/federated_main.py --model=mlp --dataset=mnist  --iid=1 --epochs=10 |---- Avg Train Accuracy: 93.33%|---- Test Accuracy: 77.23%
+python src/federated_main2.py --model=mlp --dataset=mnist  --iid=1 --epochs=10 
+python src/federated_main_change.py --model=mlp --dataset=mnist  --iid=1 --epochs=10  
+python src/federated_main_change_5_29.py --model=mlp --dataset=mnist  --iid=0 --epochs=10  
+python src/federated_main_change_5_30.py --model=mlp --dataset=mnist  --iid=0 --epochs=20  
+python src/federated_main_change_6_2.py --model=mlp --dataset=mnist  --iid=0 --epochs=15   
+改成while 看epoc幾次acc=99
+原本noniid global epochs = 200~
+
