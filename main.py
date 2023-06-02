@@ -8,6 +8,7 @@ from os.path import isfile
 from pathlib import Path
 
 import yaml
+import torch
 from torch.utils.tensorboard import SummaryWriter
 
 from src.server import Server
@@ -52,7 +53,7 @@ def traingCP(server: Server):
 
 if __name__ == "__main__":
     serverList = []
-    mypath = "./configs/TwoNN/MNIST"
+    mypath = "C:/Users/mobile_lab/Desktop/408261204/Federated-Averaging-PyTorch-main/configs/TwoNN/"
     logDir = ""
     processList = []
     filePathList = loadConfigDir(path=mypath)
@@ -80,6 +81,7 @@ if __name__ == "__main__":
         # initialize federated learning
         central_server = Server(writer, model_config, global_config, data_config, init_config, fed_config, optim_config,
                                 log_config)
+        print(torch.__version__)
         central_server.setup()
         serverList.append(central_server)
 

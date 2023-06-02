@@ -6,8 +6,11 @@
 import numpy as np
 from torchvision import datasets, transforms
 
+import sys
+sys.path.append("..")
+
 from configs.ILP_Heuristic_method_parameter import num_of_MNIST_label
-from src.algorithm.Heuristic import heuristic_method
+from algorithm.Heuristic import heuristic_method
 
 
 def mnist_iid(dataset, num_users):
@@ -48,7 +51,9 @@ def mnist_noniid(dataset, num_users):
     # divide and assign 2 shards/client
     for i in range(num_users):
         rand_set = set(np.random.choice(idx_shard, 2, replace=False))
+        #print("rand_set",rand_set)
         idx_shard = list(set(idx_shard) - rand_set)
+        #print("idx_shard",idx_shard)
         for rand in rand_set:
             dict_users[i] = np.concatenate(
                 (dict_users[i], idxs[rand * num_imgs:(rand + 1) * num_imgs]), axis=0)

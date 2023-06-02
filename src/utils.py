@@ -10,8 +10,14 @@ import torchvision
 from torch.utils.data import Dataset
 from torchvision import datasets, transforms
 
-from src.sampling import cifar_iid, cifar_noniid, mnist_heuristic
-from src.sampling import mnist_iid, mnist_noniid, mnist_noniid_unequal
+import sys
+sys.path.append("./")
+from sampling import cifar_iid, cifar_noniid, mnist_heuristic
+from sampling import mnist_iid, mnist_noniid, mnist_noniid_unequal
+import sys
+sys.path.append("..")
+from Determined.Determined_Cij import D_Cij
+from Determined.Determined_Xij import D_Xij
 
 logger = logging.getLogger(__name__)
 
@@ -253,13 +259,18 @@ def get_dataset(args):
 
         test_dataset = datasets.MNIST(data_dir, train=False, download=True,
                                       transform=apply_transform)
-
+        #print("iid:",mnist_iid(train_dataset, args.num_users))
+        #print("non_iid:",mnist_noniid(train_dataset, args.num_users))
+        #np.savetxt("iid.csv", mnist_iid(train_dataset, args.num_users),fmt='%1.4f',delimiter = ",")
+        #np.savetxt("non_iid.csv", mnist_noniid(train_dataset, args.num_users),fmt='%1.4f',delimiter = ",")
         # sample training data amongst users
         if args.iid == 1:
             # Sample IID user data from Mnist
-            user_groups = mnist_iid(train_dataset, args.num_users)
+            #user_groups = mnist_iid(train_dataset, args.num_users)
+            user_groups = mnist_noniid(train_dataset, args.num_users)
         if args.iid == 0:
             # Sample Non-IID user data from Mnist
+            
             if args.unequal:
                 # Chose uneuqal splits for every user
                 user_groups = mnist_noniid_unequal(train_dataset, args.num_users)
@@ -275,6 +286,22 @@ def average_weights(w):
     """
     Returns the average of the weights.
     """
+    #print("w[0]:",w[0])
+    w_avg = copy.deepcopy(w[0])
+    for key in w_avg.keys():
+        for i in range(1, len(w)):
+            w_avg[key] += w[i][key]
+        w_avg[key] = torch.div(w_avg[key], len(w))
+    return w_avg
+def Determined_weights(w):
+    """
+    Returns the ILP of the weights.
+    """
+    Client_node_number = 10
+    node_size = 50
+    W1 = 0.5
+    W2 = 0.5
+    #Cij,not_comp = D_Cij(len(w),Client_node_number,w,MD_label,MD_label_len,node_size,W1,W2)
     w_avg = copy.deepcopy(w[0])
     for key in w_avg.keys():
         for i in range(1, len(w)):
