@@ -162,7 +162,7 @@ if __name__ == '__main__':
         #print(f'\n | Global Training Round : {epoch + 1} |\n')
         print(f'\n | Global Training Round : {new_epoch + 1} |\n')
         global_model.train()
-        for i in Client_number:
+        for i in range(Client_number):
             modle_list[i].train()
         not_comp = []
         comp = []
