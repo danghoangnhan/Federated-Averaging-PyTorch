@@ -5,7 +5,7 @@ import random
 
 def Generate_network(node_size,min_edge_weight,max_edge_weight,Client_node):
 
-    G = nx.erdos_renyi_graph(node_size,0.5,directed = False)
+    G = nx.erdos_renyi_graph(node_size,0.5,directed = False,seed = 1)
 
     
     ## generate edge
